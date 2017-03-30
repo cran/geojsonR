@@ -103,7 +103,7 @@ line_string
 
 # MultiLineString
 
-multilinestring_dat = list(list(c(100, 1.01), c(200, 2.01)), list(c(100, 1.01), c(200, 2.01)))
+multilinestring_dat = list(list(c(100, 0.0), c(101, 1.0)), list(c(102, 2.0), c(103, 3.0)))
 
 multiline_string = init$MultiLineString(multilinestring_dat, stringify = TRUE)
 multiline_string
@@ -111,7 +111,7 @@ multiline_string
 
 # Polygon (WITHOUT interior rings)
 
-polygon_WITHOUT_dat = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)))
+polygon_WITHOUT_dat = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.0), c(100, 1.01)))
 
 polygon_without = init$Polygon(polygon_WITHOUT_dat, stringify = TRUE)
 polygon_without
@@ -119,9 +119,9 @@ polygon_without
 
 # Polygon (WITH interior rings)
 
-polygon_WITH_dat = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)),
+polygon_WITH_dat = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.0), c(100, 1.01)),
 
-                   list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)))
+                   list(c(50, 0.5), c(50, 0.8), c(50, 0.9), c(50, 0.5)))
 
 polygon_with = init$Polygon(polygon_WITH_dat, stringify = TRUE)
 polygon_with
@@ -131,11 +131,11 @@ polygon_with
 
 # the first polygon is without interior rings and the second one is with interior rings
 
-multi_polygon_dat = list(list(list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0))),
+multi_polygon_dat = list(list(list(c(102, 2.0), c(103, 2.0), c(103, 3.0), c(102, 2.0))),
 
-                         list(list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0)),
+                         list(list(c(100, 0.0), c(101, 1.0), c(101, 1.0), c(100, 0.0)),
 
-                              list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0))))
+                              list(c(100.2, 0.2), c(100.2, 0.8), c(100.8, 0.8), c(100.2, 0.2))))
 
 multi_polygon = init$MultiPolygon(multi_polygon_dat, stringify = TRUE)
 multi_polygon
@@ -149,27 +149,27 @@ Point = c(100, 1.01)
 
 MultiPoint = list(c(100, 1.01), c(200, 2.01))
 
-MultiLineString = list(list(c(100, 1.01), c(200, 2.01)),
+MultiLineString = list(list(c(100, 0.0), c(101, 1.0)),
 
-                  list(c(100, 1.01), c(200, 2.01)))
+                  list(c(102, 2.0), c(103, 3.0)))
 
 LineString = list(c(100, 1.01), c(200, 2.01))
 
-MultiLineString = list(list(c(100, 1.01), c(200, 2.01)),
+MultiLineString = list(list(c(100, 0.0), c(101, 1.0)),
 
-                  list(c(100, 1.01), c(200, 2.01)))
+                  list(c(102, 2.0), c(103, 3.0)))
 
-Polygon = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)))
+Polygon = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.0), c(100, 1.01)))
 
-Polygon = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)),
+Polygon = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.0), c(100, 1.01)),
 
-               list(c(100, 1.01), c(200, 2.01), c(100, 1.01), c(200, 2.01)))
+               list(c(50, 0.5), c(50, 0.8), c(50, 0.9), c(50, 0.5)))
 
-MultiPolygon = list(list(list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0))),
+MultiPolygon = list(list(list(c(102, 2.0), c(103, 2.0), c(103, 3.0), c(102, 2.0))),
 
-                    list(list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0)),
+                    list(list(c(100, 0.0), c(101, 1.0), c(101, 1.0), c(100, 0.0)),
 
-                    list(c(100, 1.0), c(200, 2.0), c(100, 1.0), c(200, 2.0))))
+                    list(c(100.2, 0.2), c(100.2, 0.8), c(100.8, 0.8), c(100.2, 0.2))))
 
 
 geometry_collection_dat = list(Point = Point, MultiPoint = MultiPoint,
