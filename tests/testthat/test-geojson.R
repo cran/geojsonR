@@ -1,8 +1,8 @@
 
-# data (all tests) ----------------------------------
+#===========================================================================
 
+# data geometry object for all functions except for the FROM_GeoJson_Schema
 
-set.seed(1)
 js_data = '{ "type": "MultiPolygon", "coordinates": [
   [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
   [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],
@@ -10,6 +10,19 @@ js_data = '{ "type": "MultiPolygon", "coordinates": [
   ]
 }'
 
+
+# data for the 'FROM_GeoJson_Schema' function
+
+schema_str = '{
+                "name" : "example_name",
+                "location" : {
+                    "type" : "Point",
+                    "coordinates" : [ -120.24, 39.21 ]
+                  }
+               }'
+
+
+#===========================================================================
 
 
 # data (geometry collection) -----------------------
@@ -98,6 +111,30 @@ testthat::test_that("in case that the 'url_file_string' parameter is not a chara
 })
 
 
+testthat::test_that("in case that the 'Flatten_Coords' parameter is not a boolean it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson(url_file_string = js_data, Flatten_Coords = mt) )
+})
+
+
+testthat::test_that("in case that the 'Average_Coordinates' parameter is not a boolean it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson(url_file_string = js_data, Average_Coordinates = mt) )
+})
+
+
+
+testthat::test_that("in case that the 'To_List' parameter is not a boolean it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson(url_file_string = js_data, To_List = mt) )
+})
+
 
 testthat::test_that("in case that the 'url_file_string' parameter is a geojson character string it returns a named list", {
 
@@ -124,11 +161,79 @@ testthat::test_that("in case that the 'url_file_string' parameter is a character
 
   obj = tmp$type == "Feature"
 
-  len = sum(dim(tmp$geometry$coordinates) == c(1, 2)) == 2
+  len = length(tmp$geometry$coordinates) == 2
 
   testthat::expect_true(sum(c(nams, obj, len)) == 3)
 })
 
+
+#-----------------------------
+# FROM_GeoJson_Schema function
+#-----------------------------
+
+
+
+testthat::test_that("in case that the 'url_file_string' parameter is not a character string it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson_Schema(url_file_string = mt) )
+})
+
+
+testthat::test_that("in case that the 'geometry_name' parameter is not a character string it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson_Schema(url_file_string = schema_str, geometry_name = mt) )
+})
+
+
+testthat::test_that("in case that the 'Average_Coordinates' parameter is not a boolean it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson_Schema(url_file_string = schema_str, Average_Coordinates = mt) )
+})
+
+
+
+testthat::test_that("in case that the 'To_List' parameter is not a boolean it returns an error", {
+
+  mt = matrix(runif(10), 2, 5)
+
+  testthat::expect_error( FROM_GeoJson_Schema(url_file_string = schema_str, To_List = mt) )
+})
+
+
+testthat::test_that("in case that the 'url_file_string' parameter is a geojson character string it returns a named list", {
+
+  tmp = FROM_GeoJson_Schema(url_file_string = schema_str, geometry_name = "location")
+
+  nams = sum(names(tmp) %in% c("location", "name")) == 2
+
+  obj = tmp$location$type == "Point"
+
+  len = length(tmp$location$coordinates) == 2
+
+  testthat::expect_true(sum(c(nams, obj, len)) == 3)
+})
+
+
+testthat::test_that("in case that the 'url_file_string' parameter is a character string path to a file it returns a named list", {
+
+  PATH = paste0(getwd(), path.expand("/file_data/Schema_data.geojson"))
+
+  tmp = FROM_GeoJson_Schema(url_file_string = PATH, geometry_name = "geometry")
+
+  nams = sum(names(tmp) %in% c("_id", "geometry", "name")) == 3
+
+  obj = tmp$geometry$type == "Polygon"
+
+  len = sum(dim(tmp$geometry$coordinates) == c(4649, 2)) == 2
+
+  testthat::expect_true(sum(c(nams, obj, len)) == 3)
+})
 
 
 #---------------------------
@@ -164,7 +269,7 @@ testthat::test_that("in case that the 'url_file' parameter is a valid path to a 
 
   obj = tmp_OUT$type == "Feature"
 
-  len = sum(dim(tmp_OUT$geometry$coordinates) == c(1, 2)) == 2
+  len = length(tmp_OUT$geometry$coordinates) == 2
 
   testthat::expect_true(sum(c(nams, obj, len)) == 3)
 })

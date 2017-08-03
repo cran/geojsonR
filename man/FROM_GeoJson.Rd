@@ -4,12 +4,17 @@
 \alias{FROM_GeoJson}
 \title{reads GeoJson data}
 \usage{
-FROM_GeoJson(url_file_string, ...)
+FROM_GeoJson(url_file_string, Flatten_Coords = FALSE,
+  Average_Coordinates = FALSE, To_List = FALSE)
 }
 \arguments{
 \item{url_file_string}{a string specifying the input path to a file OR a geojson object (in form of a character string) OR a valid url (beginning with 'http..') pointing to a geojson object}
 
-\item{...}{See details for the \emph{ellipsis} (...).}
+\item{Flatten_Coords}{either TRUE or FALSE. If TRUE then the properties member of the geojson file will be omitted during parsing.}
+
+\item{Average_Coordinates}{either TRUE or FALSE. If TRUE then additionally a geojson-dump and the average latitude and longitude of the geometry object will be returned.}
+
+\item{To_List}{either TRUE or FALSE. If TRUE then the \emph{coordinates} of the geometry object will be returned in form of a list, otherwise in form of a numeric matrix.}
 }
 \value{
 a (nested) list
@@ -18,23 +23,25 @@ a (nested) list
 reads GeoJson data
 }
 \details{
-The \emph{FROM_GeoJson} function can take two more parameters : \emph{flatten_coords} and \emph{average_coordinates}. Both parameters are boolean.
-If \emph{flatten_coords} is TRUE then the properties member of the geojson file will be omitted. If \emph{average_coordinates} is TRUE then additionally a geojson-dump and the average
-latitude and longitude of the geometry object will be returned.
+The \emph{FROM_GeoJson} function is based on the 'RFC 7946' specification. Thus, geojson files/strings which include property-names other than the 'RFC 7946' specifies will return an error. To avoid errors of
+that kind a user should take advantage of the \emph{FROM_GeoJson_Schema} function, which is not as strict concerning the property names.
 }
 \examples{
+
 
 library(geojsonR)
 
 
 # INPUT IS A FILE
+#----------------
 
-# Do not run
-
-# res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
+\dontrun{
+res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
+}
 
 
 # INPUT IS A GEOJSON (character string)
+#--------------------------------------
 
 tmp_str = '{ "type": "MultiPolygon", "coordinates": [
   [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
@@ -47,10 +54,9 @@ res = FROM_GeoJson(url_file_string = tmp_str)
 
 
 # INPUT IS A URL
+#---------------
 
-# Do not run
-
-# res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
-
+\dontrun{
+res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
 }
-
+}

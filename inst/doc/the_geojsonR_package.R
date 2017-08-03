@@ -201,6 +201,35 @@
 
 ## ---- eval = F-----------------------------------------------------------
 #  
+#  tmp_str = '{
+#               "name" : "example_name",
+#               "location" : {
+#                   "type" : "Point",
+#                   "coordinates" : [ -120.24, 39.21 ]
+#                 }
+#              }'
+#  
+#  res = FROM_GeoJson_Schema(url_file_string = tmp_str, geometry_name = "location")
+#  
+#  res
+#  
+
+## ---- eval = F-----------------------------------------------------------
+#  
+#  $location
+#  $location$type
+#  [1] "Point"
+#  
+#  $location$coordinates
+#  [1] -120.24   39.21
+#  
+#  
+#  $name
+#  [1] "example_name"
+#  
+
+## ---- eval = F-----------------------------------------------------------
+#  
 #  init = TO_GeoJson$new()
 #  
 #  polygon_WITH_dat = list(list(c(100, 1.01), c(200, 2.01), c(100, 1.0), c(100, 1.01)),

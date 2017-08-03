@@ -7,15 +7,16 @@
 using namespace Rcpp;
 
 // export_From_geojson
-Rcpp::List export_From_geojson(std::string input_file, bool flatten_coords, bool average_coordinates);
-RcppExport SEXP geojsonR_export_From_geojson(SEXP input_fileSEXP, SEXP flatten_coordsSEXP, SEXP average_coordinatesSEXP) {
+Rcpp::List export_From_geojson(std::string input_file, bool flatten_coords, bool average_coordinates, bool to_list);
+RcppExport SEXP geojsonR_export_From_geojson(SEXP input_fileSEXP, SEXP flatten_coordsSEXP, SEXP average_coordinatesSEXP, SEXP to_listSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type input_file(input_fileSEXP);
     Rcpp::traits::input_parameter< bool >::type flatten_coords(flatten_coordsSEXP);
     Rcpp::traits::input_parameter< bool >::type average_coordinates(average_coordinatesSEXP);
-    rcpp_result_gen = Rcpp::wrap(export_From_geojson(input_file, flatten_coords, average_coordinates));
+    Rcpp::traits::input_parameter< bool >::type to_list(to_listSEXP);
+    rcpp_result_gen = Rcpp::wrap(export_From_geojson(input_file, flatten_coords, average_coordinates, to_list));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -50,6 +51,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<std::string> >::type feat_files_lst(feat_files_lstSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type bbox_vec(bbox_vecSEXP);
     rcpp_result_gen = Rcpp::wrap(Features_TO_Collection(feat_files_lst, bbox_vec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// export_From_geojson_schema
+Rcpp::List export_From_geojson_schema(std::string input_file, std::string GEOMETRY_OBJECT_NAME, bool average_coordinates, bool to_list);
+RcppExport SEXP geojsonR_export_From_geojson_schema(SEXP input_fileSEXP, SEXP GEOMETRY_OBJECT_NAMESEXP, SEXP average_coordinatesSEXP, SEXP to_listSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type input_file(input_fileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type GEOMETRY_OBJECT_NAME(GEOMETRY_OBJECT_NAMESEXP);
+    Rcpp::traits::input_parameter< bool >::type average_coordinates(average_coordinatesSEXP);
+    Rcpp::traits::input_parameter< bool >::type to_list(to_listSEXP);
+    rcpp_result_gen = Rcpp::wrap(export_From_geojson_schema(input_file, GEOMETRY_OBJECT_NAME, average_coordinates, to_list));
     return rcpp_result_gen;
 END_RCPP
 }

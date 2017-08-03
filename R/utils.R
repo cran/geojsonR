@@ -3,26 +3,30 @@
 #' reads GeoJson data
 #'
 #' @param url_file_string a string specifying the input path to a file OR a geojson object (in form of a character string) OR a valid url (beginning with 'http..') pointing to a geojson object
-#' @param ... See details for the \emph{ellipsis} (...).
+#' @param Flatten_Coords either TRUE or FALSE. If TRUE then the properties member of the geojson file will be omitted during parsing.
+#' @param Average_Coordinates either TRUE or FALSE. If TRUE then additionally a geojson-dump and the average latitude and longitude of the geometry object will be returned.
+#' @param To_List either TRUE or FALSE. If TRUE then the \emph{coordinates} of the geometry object will be returned in form of a list, otherwise in form of a numeric matrix.
 #' @return a (nested) list
 #' @details
-#' The \emph{FROM_GeoJson} function can take two more parameters : \emph{flatten_coords} and \emph{average_coordinates}. Both parameters are boolean.
-#' If \emph{flatten_coords} is TRUE then the properties member of the geojson file will be omitted. If \emph{average_coordinates} is TRUE then additionally a geojson-dump and the average
-#' latitude and longitude of the geometry object will be returned.
+#' The \emph{FROM_GeoJson} function is based on the 'RFC 7946' specification. Thus, geojson files/strings which include property-names other than the 'RFC 7946' specifies will return an error. To avoid errors of
+#' that kind a user should take advantage of the \emph{FROM_GeoJson_Schema} function, which is not as strict concerning the property names.
 #' @export
 #' @examples
+#'
 #'
 #' library(geojsonR)
 #'
 #'
 #' # INPUT IS A FILE
+#' #----------------
 #'
-#' # Do not run
-#'
-#' # res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
+#' \dontrun{
+#' res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
+#' }
 #'
 #'
 #' # INPUT IS A GEOJSON (character string)
+#' #--------------------------------------
 #'
 #' tmp_str = '{ "type": "MultiPolygon", "coordinates": [
 #'   [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
@@ -35,18 +39,18 @@
 #'
 #'
 #' # INPUT IS A URL
+#' #---------------
 #'
-#' # Do not run
-#'
-#' # res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
-#'
+#' \dontrun{
+#' res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
+#' }
 
-FROM_GeoJson = function(url_file_string, ...) {
+FROM_GeoJson = function(url_file_string, Flatten_Coords = FALSE, Average_Coordinates = FALSE, To_List = FALSE) {
 
-  if (!inherits(url_file_string, 'character') && length(url_file_string) != 1) {
-
-    stop("the 'url_file_string' parameter should be of type character string", call. = F)
-  }
+  if (!inherits(url_file_string, 'character') && length(url_file_string) != 1) { stop("the 'url_file_string' parameter should be of type character string", call. = F) }
+  if (!inherits(Flatten_Coords, "logical")) { stop("the 'Flatten_Coords' parameter should be of type boolean", call. = F) }
+  if (!inherits(Average_Coordinates, "logical")) { stop("the 'Average_Coordinates' parameter should be of type boolean", call. = F) }
+  if (!inherits(To_List, "logical")) { stop("the 'To_List' parameter should be of type boolean", call. = F) }
 
   if (substring(url_file_string, 1, 4) == "http") {       # only url-addresses which start with 'http' will be considered as valid
 
@@ -59,7 +63,63 @@ FROM_GeoJson = function(url_file_string, ...) {
     rm(con); gc()
   }
 
-  res = export_From_geojson(url_file_string, ...)
+  res = export_From_geojson(url_file_string, Flatten_Coords, Average_Coordinates, To_List)
+
+  return(res)
+}
+
+
+
+#' reads GeoJson data using a one-word-schema
+#'
+#' @param url_file_string a string specifying the input path to a file OR a geojson object (in form of a character string) OR a valid url (beginning with 'http..') pointing to a geojson object
+#' @param geometry_name a string specifying the geometry name in the geojson string/file. The \emph{geometry_name} functions as a one-word schema and can significantly speed up the parsing of the data.
+#' @param Average_Coordinates either TRUE or FALSE. If TRUE then additionally a geojson-dump and the average latitude and longitude of the geometry object will be returned.
+#' @param To_List either TRUE or FALSE. If TRUE then the \emph{coordinates} of the geometry object will be returned in form of a list, otherwise in form of a numeric matrix.
+#' @return a (nested) list
+#' @details
+#' This function is appropriate when the property-names do not match exactly the 'RFC 7946' specification ( for instance if the \emph{geometry} object-name appears as \emph{location} as is the case sometimes in mongodb queries ).
+#' The user can then specify the \emph{geometry_name} as it exactly appears in the .geojson string/file (consult the example for more details). If no \emph{geometry_name} is given then recursion will be used, which increases the processing time.
+#' In case that the input .geojson object is of \emph{type} : \emph{Point}, \emph{LineString}, \emph{MultiPoint}, \emph{Polygon}, \emph{GeometryCollection}, \emph{MultiLineString}, \emph{MultiPolygon},
+#'  \emph{Feature} or \emph{FeatureCollection} with a second attribute name : \emph{coordinates}, then the \emph{geometry_name} parameter is not necessary.
+#' @export
+#' @examples
+#'
+#' library(geojsonR)
+#'
+#'
+#' # INPUT IS A GEOJSON (character string)
+#'
+#' tmp_str = '{
+#'             "name" : "example_name",
+#'             "location" : {
+#'                 "type" : "Point",
+#'                 "coordinates" : [ -120.24, 39.21 ]
+#'               }
+#'            }'
+#'
+#' res = FROM_GeoJson_Schema(url_file_string = tmp_str, geometry_name = "location")
+#'
+
+FROM_GeoJson_Schema = function(url_file_string, geometry_name = "", Average_Coordinates = FALSE, To_List = FALSE) {
+
+  if (!inherits(url_file_string, 'character') && length(url_file_string) != 1) { stop("the 'url_file_string' parameter should be of type character string", call. = F) }
+  if (!inherits(geometry_name, "character")) { stop("the 'geometry_name' parameter should be of type character", call. = F) }
+  if (!inherits(Average_Coordinates, "logical")) { stop("the 'Average_Coordinates' parameter should be of type boolean", call. = F) }
+  if (!inherits(To_List, "logical")) { stop("the 'To_List' parameter should be of type boolean", call. = F) }
+
+  if (substring(url_file_string, 1, 4) == "http") {       # only url-addresses which start with 'http' will be considered as valid
+
+    con = url(url_file_string, method = "libcurl")        # test url-output with : 'https://raw.githubusercontent.com/lyzidiamond/learn-geojson/master/geojson/cupcakes.geojson'
+
+    url_json = readLines(con, warn = FALSE)
+
+    url_file_string = paste(url_json, collapse = "\n")
+
+    rm(con); gc()
+  }
+
+  res = export_From_geojson_schema(url_file_string, geometry_name, Average_Coordinates, To_List)
 
   return(res)
 }
@@ -73,12 +133,11 @@ FROM_GeoJson = function(url_file_string, ...) {
 #' @export
 #' @examples
 #'
+#' \dontrun{
 #' library(geojsonR)
 #'
-#' # Do not run
-#'
-#' # res = Dump_From_GeoJson("/myfolder/point.geojson")
-#'
+#' res = Dump_From_GeoJson("/myfolder/point.geojson")
+#' }
 
 Dump_From_GeoJson = function(url_file) {
 
@@ -458,16 +517,15 @@ TO_GeoJson <- R6::R6Class("TO_GeoJson",
 #' @export
 #' @examples
 #'
+#' \dontrun{
 #' library(geojsonR)
 #'
-#' # Do not run
+#' vec_files = c("/myfolder/Feature1.geojson", "/myfolder/Feature2.geojson",
+#'               "/myfolder/Feature3.geojson", "/myfolder/Feature4.geojson",
+#'               "/myfolder/Feature5.geojson")
 #'
-#' # vec_files = c("/myfolder/Feature1.geojson", "/myfolder/Feature2.geojson",
-#' #               "/myfolder/Feature3.geojson", "/myfolder/Feature4.geojson",
-#' #               "/myfolder/Feature5.geojson")
-#'
-#' # res = Features_2Collection(vec_files, bbox_vec = NULL)
-#'
+#' res = Features_2Collection(vec_files, bbox_vec = NULL)
+#' }
 
 Features_2Collection = function(Features_files_vec, bbox_vec = NULL) {
 

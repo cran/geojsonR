@@ -3,6 +3,7 @@ useDynLib(geojsonR, .registration = TRUE)
 
 export(Dump_From_GeoJson)
 export(FROM_GeoJson)
+export(FROM_GeoJson_Schema)
 export(Features_2Collection)
 export(TO_GeoJson)
 export(shiny_from_JSON)

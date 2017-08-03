@@ -10,7 +10,7 @@
  *
  * @Notes: reads GeoJson from file / url / character-string
  *
- * @last_modified: March 2017
+ * @last_modified: July 2017
  *
  **/
 
@@ -53,7 +53,7 @@ public:
   // switch (if-else) function for the geometry-objects
   //
 
-  Rcpp::List geom_OBJ(std::string geom_OBJECT, json11::Json input_obj, int polygon_size = 1, bool average_coordinates = false) {       // 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+  Rcpp::List geom_OBJ(std::string geom_OBJECT, json11::Json input_obj, int polygon_size = 1, bool average_coordinates = false, bool to_list = false) {       // 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
 
     Rcpp::List switch_OBJ;
 
@@ -61,15 +61,15 @@ public:
 
       json11::Json::array tmp_point = input_obj["coordinates"].array_items();
 
-      arma::mat res_point(1, 2);
+      Rcpp::NumericVector res_point(2);                                             // in case of 'Point' by default return an Rcpp::NumericVector
 
-      res_point(0,0) = tmp_point[0].number_value();
+      res_point[0] = tmp_point[0].number_value();
 
-      res_point(0,1) = tmp_point[1].number_value();
+      res_point[1] = tmp_point[1].number_value();
 
       switch_OBJ["unlist_OBJ"] = res_point;
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         flatten_coords_pr.set_size(2);
 
@@ -94,28 +94,54 @@ public:
 
       unsigned int size_array = tmp_array.size();
 
-      arma::mat tmp_RES_(size_array, 2);
+      arma::mat tmp_RES_(size_array, 2);                                  // initialize to_list = F
+
+      Rcpp::List tmp_RES_LIST(size_array);                                // initialize to_list = T
 
       for (unsigned int i = 0; i < size_array; i++) {
 
         json11::Json::array inner_array = tmp_array[i].array_items();
 
-        arma::rowvec inner_vec(inner_array.size());
+        arma::rowvec inner_vec(inner_array.size());                       // initialize to_list = F
+
+        Rcpp::NumericVector res_LMP_sizeONE(2);                           // initialize to_list = T
 
         for (unsigned int j = 0; j < inner_array.size(); j++) {
 
-          inner_vec(j) = inner_array[j].number_value();
+          if (to_list) {
+
+            res_LMP_sizeONE[j] = inner_array[j].number_value();}
+
+          else {
+
+            inner_vec(j) = inner_array[j].number_value();
+          }
         }
 
-        tmp_RES_.row(i) = inner_vec;
+        if (to_list) {
+
+          tmp_RES_LIST[i] = res_LMP_sizeONE;}
+
+        else {
+
+          tmp_RES_.row(i) = inner_vec;
+        }
       }
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(tmp_RES_, 0));
       }
 
-      switch_OBJ["unlist_OBJ"] = tmp_RES_;
+      if (to_list) {
+
+        switch_OBJ["unlist_OBJ"] = tmp_RES_LIST;
+      }
+
+      else {
+
+        switch_OBJ["unlist_OBJ"] = tmp_RES_;
+      }
     }
 
     else if (geom_OBJECT == "MultiLineString" || (geom_OBJECT == "Polygon" && polygon_size > 1)) {
@@ -128,7 +154,7 @@ public:
 
       arma::mat outer_avg;
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         outer_avg.set_size(inner_poly_size, 2);
       }
@@ -141,29 +167,54 @@ public:
 
         arma::mat coord_mat(size_array, 2);
 
+        Rcpp::List tmp_RES_LIST_MP(size_array);
+
         for (unsigned int i = 0; i < size_array; i++) {
 
           json11::Json::array inner_array = tmp_array[i].array_items();
 
           arma::rowvec inner_vec(inner_array.size());
 
+          Rcpp::NumericVector res_LMP_sizeMULTI(2);
+
           for (unsigned int j = 0; j < inner_array.size(); j++) {
 
-            inner_vec(j) = inner_array[j].number_value();
+            if (to_list) {
+
+              res_LMP_sizeMULTI[j] = inner_array[j].number_value();}
+
+            else {
+
+              inner_vec(j) = inner_array[j].number_value();
+            }
           }
 
-          coord_mat.row(i) = inner_vec;
+          if (to_list) {
+
+            tmp_RES_LIST_MP[i] = res_LMP_sizeMULTI;}
+
+          else {
+
+            coord_mat.row(i) = inner_vec;
+          }
         }
 
-        if (average_coordinates) {
+        if (average_coordinates && !to_list) {
 
           outer_avg.row(k) = arma::conv_to< arma::rowvec >::from(arma::mean(coord_mat, 0));
         }
 
-        tmp_RES_poly_interior.push_back(coord_mat);
+        if (to_list) {
+
+          tmp_RES_poly_interior.push_back(tmp_RES_LIST_MP);}
+
+        else {
+
+          tmp_RES_poly_interior.push_back(coord_mat);
+        }
       }
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg, 0));
       }
@@ -179,7 +230,7 @@ public:
 
       arma::mat outer_avg;
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         outer_avg.set_size(outer_size, 2);
       }
@@ -198,26 +249,51 @@ public:
 
           arma::mat tmp_RES_(size_array, 2);
 
+          Rcpp::List tmp_RES_LIST_MPoly(size_array);
+
           for (unsigned int i = 0; i < size_array; i++) {
 
             json11::Json::array inner_array = tmp_array[i].array_items();
 
             arma::rowvec inner_vec(inner_array.size());
 
+            Rcpp::NumericVector res_MPoly(2);
+
             for (unsigned int j = 0; j < inner_array.size(); j++) {
 
-              inner_vec(j) = inner_array[j].number_value();
+              if (to_list) {
+
+                res_MPoly[j] = inner_array[j].number_value();}
+
+              else {
+
+                inner_vec(j) = inner_array[j].number_value();
+              }
             }
 
-            tmp_RES_.row(i) = inner_vec;
+            if (to_list) {
+
+              tmp_RES_LIST_MPoly[i] = res_MPoly;}
+
+            else {
+
+              tmp_RES_.row(i) = inner_vec;
+            }
           }
 
-          if (average_coordinates) {
+          if (average_coordinates && !to_list) {
 
             outer_avg.row(k) = arma::conv_to< arma::rowvec >::from(arma::mean(tmp_RES_, 0));
           }
 
-          switch_OBJ.push_back(tmp_RES_);
+          if (to_list) {
+
+            switch_OBJ.push_back(tmp_RES_LIST_MPoly);}
+
+          else {
+
+            switch_OBJ.push_back(tmp_RES_);
+          }
         }
 
         if (tmp_size_array > 1) {
@@ -230,7 +306,7 @@ public:
 
           arma::mat outer_avg_sec;
 
-          if (average_coordinates) {
+          if (average_coordinates && !to_list) {
 
             outer_avg_sec.set_size(inner_poly_size, 2);
           }
@@ -243,29 +319,54 @@ public:
 
             arma::mat coord_mat(size_array, 2);
 
+            Rcpp::List tmp_RES_LIST_MPolyMULTI(size_array);
+
             for (unsigned int i = 0; i < size_array; i++) {
 
               json11::Json::array inner_array = tmp_array[i].array_items();
 
               arma::rowvec inner_vec(inner_array.size());
 
+              Rcpp::NumericVector res_MPolyMULTI(2);
+
               for (unsigned int j = 0; j < inner_array.size(); j++) {
 
-                inner_vec(j) = inner_array[j].number_value();
+                if (to_list) {
+
+                  res_MPolyMULTI[j] = inner_array[j].number_value();}
+
+                else {
+
+                  inner_vec(j) = inner_array[j].number_value();
+                }
               }
 
-              coord_mat.row(i) = inner_vec;
+              if (to_list) {
+
+                tmp_RES_LIST_MPolyMULTI[i] = res_MPolyMULTI;}
+
+              else {
+
+                coord_mat.row(i) = inner_vec;
+              }
             }
 
-            if (average_coordinates) {
+            if (average_coordinates && !to_list) {
 
               outer_avg_sec.row(k1) = arma::conv_to< arma::rowvec >::from(arma::mean(coord_mat, 0));
             }
 
-            tmp_RES_poly_interior.push_back(coord_mat);
+            if (to_list) {
+
+              tmp_RES_poly_interior.push_back(tmp_RES_LIST_MPolyMULTI);}
+
+            else {
+
+              tmp_RES_poly_interior.push_back(coord_mat);
+            }
           }
 
-          if (average_coordinates) {
+          if (average_coordinates && !to_list) {
 
             outer_avg.row(k) = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg_sec, 0));
           }
@@ -274,7 +375,7 @@ public:
         }
       }
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg, 0));
       }
@@ -301,7 +402,7 @@ public:
   // geometry-collection
   //
 
-  Rcpp::List geom_collection_OBJ(json11::Json parse_geom, bool average_coordinates = false) {              // 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+  Rcpp::List geom_collection_OBJ(json11::Json parse_geom, bool average_coordinates = false, bool to_list = false) {              // 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
 
     Rcpp::List RES_col;
 
@@ -315,7 +416,7 @@ public:
 
     arma::mat outer_avg;
 
-    if (average_coordinates) {
+    if (average_coordinates && !to_list) {
 
       outer_avg.set_size(SIZE, 2);
     }
@@ -334,15 +435,15 @@ public:
 
       if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
 
-        RES_inner["coordinates"] = geom_OBJ(res_type, iter, polygon_size, average_coordinates)["unlist_OBJ"];         // unlist object
+        RES_inner["coordinates"] = geom_OBJ(res_type, iter, polygon_size, average_coordinates, to_list)["unlist_OBJ"];         // unlist object
       }
 
       else {
 
-        RES_inner["coordinates"] = geom_OBJ(res_type, iter, polygon_size, average_coordinates);
+        RES_inner["coordinates"] = geom_OBJ(res_type, iter, polygon_size, average_coordinates, to_list);
       }
 
-      if (average_coordinates) {
+      if (average_coordinates && !to_list) {
 
         outer_avg.row(f) = flatten_coords_pr;
 
@@ -352,7 +453,7 @@ public:
       geoms_tmp.push_back(RES_inner);
     }
 
-    if (average_coordinates) {
+    if (average_coordinates && !to_list) {
 
       flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg, 0));
     }
@@ -421,7 +522,7 @@ public:
   // geojson object : "Feature"
   //
 
-  Rcpp::List feature_OBJ(json11::Json input_obj, bool flatten_coords = false, bool average_coordinates = false) {     // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+  Rcpp::List feature_OBJ(json11::Json input_obj, bool flatten_coords = false, bool average_coordinates = false, bool to_list = false) {     // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
 
     Rcpp::List RES_feat;
 
@@ -475,11 +576,11 @@ public:
 
         if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
 
-          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates)["unlist_OBJ"];}                           // unlist object
+          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates, to_list)["unlist_OBJ"];}                           // unlist object
 
         else {
 
-          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates);
+          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates, to_list);
         }
 
         RES_feat["geometry"] = RES_OUT_feat;
@@ -504,10 +605,54 @@ public:
   }
 
 
+
+  // geojson object : "Feature"  [ used in the 'schema' function ]
+  //
+
+  Rcpp::List feature_OBJ_schema(json11::Json input_obj, bool average_coordinates = false, bool to_list = false) {     // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+
+    Rcpp::List RES_feat;
+
+    for (auto& iter : input_obj.object_items()) {
+
+      if (iter.first == "geometry") {                                                           // In 'Feature' the property-name of each geometry-object is 'geometry'
+
+        json11::Json tmp_geom = input_obj["geometry"];
+
+        std::string res_type = tmp_geom["type"].string_value();
+
+        int polygon_size = tmp_geom["coordinates"].array_items().size();
+
+        Rcpp::List RES_OUT_feat;
+
+        RES_OUT_feat["type"] = res_type;
+
+        if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
+
+          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates, to_list)["unlist_OBJ"];}                           // unlist object
+
+        else {
+
+          RES_OUT_feat["coordinates"] = geom_OBJ(res_type, tmp_geom, polygon_size, average_coordinates, to_list);
+        }
+
+        RES_feat["geometry"] = RES_OUT_feat;
+      }
+
+      else {
+
+        RES_feat[iter.first] = recursive_switch(iter.second);
+      }
+    }
+
+    return RES_feat;
+  }
+
+
   // geojson object : "FeatureCollection"
   //
 
-  Rcpp::List feature_collection_geojson(json11::Json input_obj, bool flatten_coords = false, bool average_coordinates = false) {         // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+  Rcpp::List feature_collection_geojson(json11::Json input_obj, bool flatten_coords = false, bool average_coordinates = false, bool to_list = false) {         // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
 
     Rcpp::List RES_feat_col;
 
@@ -539,16 +684,16 @@ public:
 
         arma::mat outer_avg;
 
-        if (average_coordinates) {
+        if (average_coordinates && !to_list) {
 
           outer_avg.set_size(tmp_arr.size(), 2);
         }
 
         for (auto& itf : tmp_arr) {
 
-          lst_feats.push_back(feature_OBJ(itf, flatten_coords, average_coordinates));
+          lst_feats.push_back(feature_OBJ(itf, flatten_coords, average_coordinates, to_list));
 
-          if (average_coordinates) {
+          if (average_coordinates && !to_list) {
 
             outer_avg.row(ITER_AVG) = flatten_coords_pr;
 
@@ -558,12 +703,69 @@ public:
           }
         }
 
-        if (average_coordinates) {
+        if (average_coordinates && !to_list) {
 
           flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg, 0));
         }
 
         RES_feat_col["features"] = lst_feats;
+      }
+    }
+
+    return RES_feat_col;
+  }
+
+
+
+  // geojson object : "FeatureCollection"     [ used in the 'schema' function ]
+  //
+
+  Rcpp::List feature_collection_geojson_schema(json11::Json input_obj, bool average_coordinates = false, bool to_list = false) {         // 'flatten_coords' and 'average_coordinates' of geojson object is needed (indirectly) in leaflet's "setView()"
+
+    Rcpp::List RES_feat_col;
+
+    for (auto& iter : input_obj.object_items()) {
+
+      if (iter.first == "features") {
+
+        Rcpp::List lst_feats;
+
+        json11::Json::array tmp_arr = input_obj["features"].array_items();
+
+        unsigned int ITER_AVG = 0;
+
+        arma::mat outer_avg;
+
+        if (average_coordinates && !to_list) {
+
+          outer_avg.set_size(tmp_arr.size(), 2);
+        }
+
+        for (auto& itf : tmp_arr) {
+
+          lst_feats.push_back(feature_OBJ_schema(itf, average_coordinates, to_list));        // In 'FeatureCollection' the property-name of each geometry-object is 'geometry'
+
+          if (average_coordinates && !to_list) {
+
+            outer_avg.row(ITER_AVG) = flatten_coords_pr;
+
+            flatten_coords_pr.clear();                       // each time it's called : it first assigns to arma::mat then clears the private-variable [ due to "inside-class-loop" ]
+
+            ITER_AVG++;
+          }
+        }
+
+        if (average_coordinates && !to_list) {
+
+          flatten_coords_pr = arma::conv_to< arma::rowvec >::from(arma::mean(outer_avg, 0));
+        }
+
+        RES_feat_col[iter.first] = lst_feats;
+      }
+
+      else {
+
+        RES_feat_col[iter.first] = recursive_switch(iter.second);
       }
     }
 
@@ -625,13 +827,85 @@ public:
   }
 
 
+  // helper function [ for 'export_From_geojson' and 'export_From_geojson_schema' ]
+  //
+
+  Rcpp::List helper_geom_objects(From_GeoJson_geometries prs, json11::Json tmp_prs, bool flatten_coords = false,
+
+                                 bool average_coordinates = false, bool schema = false, bool to_list = false) {
+
+    Rcpp::List RES_OUT;
+
+    std::string res_type = tmp_prs["type"].string_value();
+
+    int polygon_size = tmp_prs["coordinates"].array_items().size();
+
+    if (res_type == "GeometryCollection") {
+
+      RES_OUT = prs.geom_collection_OBJ(tmp_prs, average_coordinates, to_list);}
+
+    else if (res_type == "Feature") {
+
+      if (schema) {
+
+        RES_OUT = prs.feature_OBJ_schema(tmp_prs, average_coordinates, to_list);}                              // use the modified version of 'feature_OBJ' function [ 'feature_OBJ_schema' ], which is not as strict concerning the 'RFC 7946'
+
+      else {
+
+        RES_OUT = prs.feature_OBJ(tmp_prs, flatten_coords, average_coordinates, to_list);                      // setting 'flatten_coords' to TRUE avoids 'properties' member recursive calculation
+      }
+    }
+
+    else if (res_type == "FeatureCollection") {
+
+      if (schema) {
+
+        RES_OUT = prs.feature_collection_geojson_schema(tmp_prs, average_coordinates, to_list);}               // use the modified version of 'feature_collection_geojson' function [ 'feature_collection_geojson_schema' ], which is not as strict concerning the 'RFC 7946'
+
+      else {
+
+        RES_OUT = prs.feature_collection_geojson(tmp_prs, flatten_coords, average_coordinates, to_list);
+      }
+    }
+
+    else if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
+
+      RES_OUT["type"] = res_type;
+
+      RES_OUT["coordinates"] = prs.geom_OBJ(res_type, tmp_prs, polygon_size, average_coordinates, to_list)["unlist_OBJ"];}      // unlist object
+
+    else if (res_type == "MultiLineString" || res_type == "MultiPolygon" || (res_type == "Polygon" && polygon_size > 1)) {
+
+      RES_OUT["type"] = res_type;
+
+      RES_OUT["coordinates"] = prs.geom_OBJ(res_type, tmp_prs, polygon_size, average_coordinates, to_list);}
+
+    else {
+
+      Rcpp::stop("Give a valid path to a '.geojson' file or a 'GeoJson' character string. Valid GeoJson objects are : 'Point', 'LineString', 'MultiPoint', 'Polygon', 'MultiLineString', 'MultiPolygon', 'GeometryCollection', 'Feature' and 'FeatureCollection' --> helper_geom_objects() function");
+    }
+
+    if (average_coordinates && !to_list) {
+
+      RES_OUT["geometry_dump"] = tmp_prs.dump();
+
+      RES_OUT["leaflet_view_coords"] = prs.return_COORDS();
+    }
+
+    return RES_OUT;
+  }
+
+
   ~From_GeoJson_geometries() { }
 };
 
 
 
+
+//========================
 // Rcpp-exported functions
-//
+//========================
+
 
 //-----------------------
 // FROM-GeoJson function
@@ -642,64 +916,22 @@ public:
 //
 
 // [[Rcpp::export]]
-Rcpp::List export_From_geojson(std::string input_file, bool flatten_coords = false, bool average_coordinates = false) {
-
-  Rcpp::List RES_OUT;
+Rcpp::List export_From_geojson(std::string input_file, bool flatten_coords = false, bool average_coordinates = false, bool to_list = false) {
 
   From_GeoJson_geometries prs;
 
   json11::Json tmp_prs;
 
-  if (prs.file_exists(input_file)) {                        // check if file exists
+  if (prs.file_exists(input_file)) {                                                                                     // check if file exists
 
-    tmp_prs = prs.parse_geojson_objects(input_file);}       // input is a path to a file
-
-  else {
-
-    tmp_prs = prs.parse_geojson_string(input_file);         // input is a geojson character string
-  }
-
-  std::string res_type = tmp_prs["type"].string_value();
-
-  int polygon_size = tmp_prs["coordinates"].array_items().size();
-
-  if (res_type == "GeometryCollection") {
-
-    RES_OUT = prs.geom_collection_OBJ(tmp_prs, average_coordinates);}
-
-  else if (res_type == "Feature") {
-
-    RES_OUT = prs.feature_OBJ(tmp_prs, flatten_coords, average_coordinates);                      // setting 'flatten_coords' to TRUE avoids 'properties' member recursive calculation
-  }
-
-  else if (res_type == "FeatureCollection") {
-
-    RES_OUT = prs.feature_collection_geojson(tmp_prs, flatten_coords, average_coordinates);
-  }
-
-  else if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
-
-    RES_OUT["type"] = res_type;
-
-    RES_OUT["coordinates"] = prs.geom_OBJ(res_type, tmp_prs, polygon_size, average_coordinates)["unlist_OBJ"];}      // unlist object
-
-  else if (res_type == "MultiLineString" || res_type == "MultiPolygon" || (res_type == "Polygon" && polygon_size > 1)) {
-
-    RES_OUT["type"] = res_type;
-
-    RES_OUT["coordinates"] = prs.geom_OBJ(res_type, tmp_prs, polygon_size, average_coordinates);}
+    tmp_prs = prs.parse_geojson_objects(input_file);}                                                                    // input is a path to a file
 
   else {
 
-    Rcpp::stop("Give a valid path to a '.geojson' file or a 'GeoJson' character string. Valid GeoJson objects are : 'Point', 'LineString', 'MultiPoint', 'Polygon', 'MultiLineString', 'MultiPolygon', 'GeometryCollection', 'Feature' and 'FeatureCollection'");
+    tmp_prs = prs.parse_geojson_string(input_file);                                                                      // input is a geojson character string
   }
 
-  if (average_coordinates) {
-
-    RES_OUT["geometry_dump"] = tmp_prs.dump();
-
-    RES_OUT["leaflet_view_coords"] = prs.return_COORDS();
-  }
+  Rcpp::List RES_OUT = prs.helper_geom_objects(prs, tmp_prs, flatten_coords, average_coordinates, false, to_list);                    // schema = false
 
   return RES_OUT;
 }
@@ -712,8 +944,6 @@ Rcpp::List export_From_geojson(std::string input_file, bool flatten_coords = fal
 
 // [[Rcpp::export]]
 SEXP export_From_JSON(std::string input_file) {
-
-  Rcpp::List RES_OUT;
 
   From_GeoJson_geometries prs;
 
@@ -779,6 +1009,96 @@ std::string Features_TO_Collection(std::vector<std::string> feat_files_lst, std:
   };
 
   return Geom_Coll_OBJ.dump();
+}
+
+
+
+// processes any geometry-object using a one-word-schema  --- appropriate for cases where the property-names do not match (exactly) the 'RFC 7946' specification [ such as in mongodb queries ]
+//
+
+// [[Rcpp::export]]
+Rcpp::List export_From_geojson_schema(std::string input_file, std::string GEOMETRY_OBJECT_NAME = "", bool average_coordinates = false, bool to_list = false) {
+
+  Rcpp::List RES_ALL;
+
+  From_GeoJson_geometries prs;
+
+  json11::Json tmp_prs;
+
+  if (prs.file_exists(input_file)) {                                                                 // check if file exists
+
+    tmp_prs = prs.parse_geojson_objects(input_file);}                                                // input is a path to a file
+
+  else {
+
+    tmp_prs = prs.parse_geojson_string(input_file);                                                  // input is a geojson character string
+  }
+
+  std::string type_col = tmp_prs["type"].string_value();                                             // check initially if the object is a 'Feature' OR a 'Feature-Collection'
+
+  if (type_col == "Point" || type_col == "LineString" || type_col == "MultiPoint" ||
+
+      type_col == "Polygon" || type_col == "GeometryCollection" ||
+
+      type_col == "MultiLineString" || type_col == "MultiPolygon" ||
+
+      type_col == "Feature" || type_col == "FeatureCollection") {
+
+    RES_ALL = prs.helper_geom_objects(prs, tmp_prs, false, average_coordinates, true, to_list);}                  // first check that the .geojson object is not one of 'Point', 'Linestring', etc. [ here use 'schema' = true ]
+
+  else {                                                                                             // otherwise [ if 'GEOMETRY_OBJECT_NAME' != "" ]:
+
+    for (auto& ITEMS : tmp_prs.object_items()) {                                                     // loop over the property-names and if 'GEOMETRY_OBJECT_NAME' exists then use the 'vectorized-armadillo' version, ....
+
+      if (ITEMS.first == GEOMETRY_OBJECT_NAME) {
+
+        json11::Json INNER_ITEM = ITEMS.second;
+
+        Rcpp::List RES_OUT;
+
+        std::string res_type = INNER_ITEM["type"].string_value();
+
+        int polygon_size = INNER_ITEM["coordinates"].array_items().size();
+
+        if (res_type == "GeometryCollection") {
+
+          RES_OUT = prs.geom_collection_OBJ(INNER_ITEM, average_coordinates, to_list);}
+
+        else if (res_type == "Point" || res_type == "LineString" || res_type == "MultiPoint" || (res_type == "Polygon" && polygon_size == 1)) {
+
+          RES_OUT["type"] = res_type;
+
+          RES_OUT["coordinates"] = prs.geom_OBJ(res_type, INNER_ITEM, polygon_size, average_coordinates, to_list)["unlist_OBJ"];}      // unlist object
+
+        else if (res_type == "MultiLineString" || res_type == "MultiPolygon" || (res_type == "Polygon" && polygon_size > 1)) {
+
+          RES_OUT["type"] = res_type;
+
+          RES_OUT["coordinates"] = prs.geom_OBJ(res_type, INNER_ITEM, polygon_size, average_coordinates, to_list);}
+
+        else {
+
+          Rcpp::stop("Give a valid path to a '.geojson' file or a 'GeoJson' character string. Valid GeoJson objects are : 'Point', 'LineString', 'MultiPoint', 'Polygon', 'MultiLineString', 'MultiPolygon', 'GeometryCollection' --> export_From_geojson_schema() function");
+        }
+
+        if (average_coordinates && !to_list) {
+
+          RES_OUT["geometry_dump"] = INNER_ITEM.dump();
+
+          RES_OUT["leaflet_view_coords"] = prs.return_COORDS();
+        }
+
+        RES_ALL[ITEMS.first] = RES_OUT;
+      }
+
+      else {
+
+        RES_ALL[ITEMS.first] = prs.recursive_switch(ITEMS.second);                           // .... , otherwise [ which means for all other property-names ] do full recursion
+      }
+    }
+  }
+
+  return RES_ALL;
 }
 
 
