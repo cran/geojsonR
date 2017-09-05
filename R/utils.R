@@ -13,20 +13,17 @@
 #' @export
 #' @examples
 #'
-#'
 #' library(geojsonR)
 #'
 #'
 #' # INPUT IS A FILE
-#' #----------------
 #'
-#' \dontrun{
-#' res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
-#' }
+#' # Do not run
+#'
+#' # res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
 #'
 #'
 #' # INPUT IS A GEOJSON (character string)
-#' #--------------------------------------
 #'
 #' tmp_str = '{ "type": "MultiPolygon", "coordinates": [
 #'   [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
@@ -39,11 +36,11 @@
 #'
 #'
 #' # INPUT IS A URL
-#' #---------------
 #'
-#' \dontrun{
-#' res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
-#' }
+#' # Do not run
+#'
+#' # res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
+#'
 
 FROM_GeoJson = function(url_file_string, Flatten_Coords = FALSE, Average_Coordinates = FALSE, To_List = FALSE) {
 
@@ -133,11 +130,12 @@ FROM_GeoJson_Schema = function(url_file_string, geometry_name = "", Average_Coor
 #' @export
 #' @examples
 #'
-#' \dontrun{
 #' library(geojsonR)
 #'
-#' res = Dump_From_GeoJson("/myfolder/point.geojson")
-#' }
+#' # Do not run
+#'
+#' # res = Dump_From_GeoJson("/myfolder/point.geojson")
+#'
 
 Dump_From_GeoJson = function(url_file) {
 
@@ -517,15 +515,16 @@ TO_GeoJson <- R6::R6Class("TO_GeoJson",
 #' @export
 #' @examples
 #'
-#' \dontrun{
 #' library(geojsonR)
 #'
-#' vec_files = c("/myfolder/Feature1.geojson", "/myfolder/Feature2.geojson",
-#'               "/myfolder/Feature3.geojson", "/myfolder/Feature4.geojson",
-#'               "/myfolder/Feature5.geojson")
+#' # Do not run
 #'
-#' res = Features_2Collection(vec_files, bbox_vec = NULL)
-#' }
+#' # vec_files = c("/myfolder/Feature1.geojson", "/myfolder/Feature2.geojson",
+#' #               "/myfolder/Feature3.geojson", "/myfolder/Feature4.geojson",
+#' #               "/myfolder/Feature5.geojson")
+#'
+#' # res = Features_2Collection(vec_files, bbox_vec = NULL)
+#'
 
 Features_2Collection = function(Features_files_vec, bbox_vec = NULL) {
 
@@ -572,4 +571,42 @@ shiny_from_JSON = function(input_file) {              # shiny apps should be in 
   return(export_From_JSON(input_file))
 }
 
+
+
+
+#' merge json files (or any kind of text files) from a directory
+#'
+#' @param INPUT_FOLDER a character string specifying a path to the input folder
+#' @param OUTPUT_FILE a character string specifying a path to the output file
+#' @param CONCAT_DELIMITER a character string specifying the delimiter to use when merging the files
+#' @param verbose either TRUE or FALSE. If TRUE then information will be printed in the console.
+#' @details
+#' This function is meant for json files but it can be applied to any kind of text files. It takes an input folder (\emph{INPUT_FOLDER}) and an output file
+#' (\emph{OUTPUT_FILE}) and merges all files from the \emph{INPUT_FOLDER} to a single \emph{OUTPUT_FILE} using the concatenation delimiter (\emph{CONCAT_DELIMITER}).
+#' @export
+#' @examples
+#'
+#' \dontrun{
+#' library(geojsonR)
+#'
+#' merge_files(INPUT_FOLDER = "/my_folder/", OUTPUT_FILE = "output_file.json")
+#' }
+
+merge_files = function(INPUT_FOLDER, OUTPUT_FILE, CONCAT_DELIMITER = "\n", verbose = FALSE) {
+
+  if (!inherits(INPUT_FOLDER, 'character') && length(INPUT_FOLDER) != 1) stop("the 'INPUT_FOLDER' parameter should be a character string", call. = F)
+  if (!inherits(OUTPUT_FILE, 'character') && length(OUTPUT_FILE) != 1) stop("the 'OUTPUT_FILE' parameter should be a character string", call. = F)
+  if (!inherits(CONCAT_DELIMITER, 'character') && length(CONCAT_DELIMITER) != 1) stop("the 'CONCAT_DELIMITER' parameter should be a character string", call. = F)
+  if (!inherits(verbose, 'logical')) stop("the 'verbose' parameter should be of type boolean", call. = F)
+
+  str_SPL = strsplit(INPUT_FOLDER, "")[[1]]
+  if (!str_SPL[nchar(INPUT_FOLDER)] %in% c("/", "\\")) stop('the "INPUT_FOLDER" parameter should end in slash', call. = F)
+
+  if (file.exists(OUTPUT_FILE)) warning(paste("the '", OUTPUT_FILE, "' file already exists. New data will be added to the end of '", OUTPUT_FILE, "' !", sep = ""), call. = F)
+  if (!dir.exists(INPUT_FOLDER)) stop("the path to the 'INPUT_FOLDER' parameter does not exist", call. = F)
+
+  merge_json(INPUT_FOLDER, OUTPUT_FILE, CONCAT_DELIMITER, verbose)
+
+  invisible()
+}
 

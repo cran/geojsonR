@@ -758,3 +758,67 @@ testthat::test_that("in case that the 'input_file' parameter is a valid path to 
   testthat::expect_true( sum(c(nams, TYPE, coords)) == 3 )
 })
 
+
+
+#---------------------
+# merge_files function
+#---------------------
+
+testthat::test_that("in case that the 'INPUT_FOLDER' parameter is not a character string it returns an error", {
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = NULL, OUTPUT_FILE = "/valid/file.json", CONCAT_DELIMITER = "\n", verbose = FALSE) )
+})
+
+
+testthat::test_that("in case that the 'OUTPUT_FILE' parameter is not a character string it returns an error", {
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = "/valid/path", OUTPUT_FILE = NULL, CONCAT_DELIMITER = "\n", verbose = FALSE) )
+})
+
+
+testthat::test_that("in case that the 'CONCAT_DELIMITER' parameter is not a character string it returns an error", {
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = "/valid/path", OUTPUT_FILE = "/valid/file.json", CONCAT_DELIMITER = NULL, verbose = FALSE) )
+})
+
+
+testthat::test_that("in case that the 'verbose' parameter is not a boolean it returns an error", {
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = "/valid/path", OUTPUT_FILE = "/valid/file.json", CONCAT_DELIMITER = "\n", verbose = NULL) )
+})
+
+
+testthat::test_that("in case that the 'INPUT_FOLDER' parameter does not end in slash it returns an error", {
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = "/valid/path", OUTPUT_FILE = "/valid/file.json", CONCAT_DELIMITER = "\n", verbose = FALSE) )
+})
+
+
+testthat::test_that("in case that the 'INPUT_FOLDER' parameter does not end in slash it returns an error", {
+
+  PATH_file_exists = paste0(getwd(), path.expand("/file_exists.json"))
+
+  testthat::expect_error( merge_files(INPUT_FOLDER = "/valid/path/", OUTPUT_FILE = PATH_file_exists, CONCAT_DELIMITER = "\n", verbose = FALSE) )
+})
+
+
+testthat::test_that("in case that the 'OUTPUT_FILE' already exists it returns a warning. Then it writes the content of the folder to a file and finally it removes the file from the directory)", {
+
+  temporary_function = function() {
+
+    PATH_folder_exists = paste0(getwd(), path.expand("/merge_folder/"))
+
+    PATH_file_exists = paste0(getwd(), path.expand("/file_exists.json"))
+
+    file.create(PATH_file_exists, showWarnings = F)
+
+    merge_files(INPUT_FOLDER = PATH_folder_exists, OUTPUT_FILE = PATH_file_exists, CONCAT_DELIMITER = "\n", verbose = FALSE)
+
+    file.remove(PATH_file_exists)
+  }
+
+  testthat::expect_warning( temporary_function() )        # at the same time it works as testthat::expect_true()
+})
+
+
+#===========================================================================

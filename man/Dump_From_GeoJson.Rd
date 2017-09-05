@@ -17,9 +17,10 @@ returns a json-dump from a geojson file
 }
 \examples{
 
-\dontrun{
 library(geojsonR)
 
-res = Dump_From_GeoJson("/myfolder/point.geojson")
-}
+# Do not run
+
+# res = Dump_From_GeoJson("/myfolder/point.geojson")
+
 }

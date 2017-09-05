@@ -68,6 +68,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// list_files
+std::vector<std::string> list_files(const std::string& path, bool full_path);
+RcppExport SEXP geojsonR_list_files(SEXP pathSEXP, SEXP full_pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type full_path(full_pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(list_files(path, full_path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// merge_json
+void merge_json(const std::string& input_folder, std::string output_file, std::string concat_delimiter, bool verbose);
+RcppExport SEXP geojsonR_merge_json(SEXP input_folderSEXP, SEXP output_fileSEXP, SEXP concat_delimiterSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type input_folder(input_folderSEXP);
+    Rcpp::traits::input_parameter< std::string >::type output_file(output_fileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type concat_delimiter(concat_delimiterSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    merge_json(input_folder, output_file, concat_delimiter, verbose);
+    return R_NilValue;
+END_RCPP
+}
 // export_To_GeoJson
 Rcpp::List export_To_GeoJson(std::string geometry_object, std::vector<double> data_POINTS, std::vector<std::vector<double>> data_ARRAYS, std::vector<std::vector<std::vector<double>>> data_ARRAY_ARRAYS, std::vector<std::vector<std::vector<std::vector<double>>>> data_POLYGON_ARRAYS, bool stringify);
 RcppExport SEXP geojsonR_export_To_GeoJson(SEXP geometry_objectSEXP, SEXP data_POINTSSEXP, SEXP data_ARRAYSSEXP, SEXP data_ARRAY_ARRAYSSEXP, SEXP data_POLYGON_ARRAYSSEXP, SEXP stringifySEXP) {

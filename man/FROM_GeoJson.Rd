@@ -28,20 +28,17 @@ that kind a user should take advantage of the \emph{FROM_GeoJson_Schema} functio
 }
 \examples{
 
-
 library(geojsonR)
 
 
 # INPUT IS A FILE
-#----------------
 
-\dontrun{
-res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
-}
+# Do not run
+
+# res = FROM_GeoJson(url_file_string = "/myfolder/feature_collection.geojson")
 
 
 # INPUT IS A GEOJSON (character string)
-#--------------------------------------
 
 tmp_str = '{ "type": "MultiPolygon", "coordinates": [
   [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
@@ -54,9 +51,9 @@ res = FROM_GeoJson(url_file_string = tmp_str)
 
 
 # INPUT IS A URL
-#---------------
 
-\dontrun{
-res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
-}
+# Do not run
+
+# res = FROM_GeoJson(url_file_string = "http://www.EXAMPLE_web_page.geojson")
+
 }

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Lampros Mouselimis" />
 
-<meta name="date" content="2017-08-03" />
+<meta name="date" content="2017-09-05" />
 
 <title>Processing of GeoJson data in R</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Processing of GeoJson data in R</h1>
 <h4 class="author"><em>Lampros Mouselimis</em></h4>
-<h4 class="date"><em>2017-08-03</em></h4>
+<h4 class="date"><em>2017-09-05</em></h4>
 
 
 
@@ -258,35 +258,6 @@ closing unused connection <span class="dv">3</span> (https:<span class="er">//</
   ..$<span class="st"> </span>statehood   :<span class="st"> </span>chr <span class="st">&quot;1850-09-09&quot;</span>
   ..$<span class="st"> </span>waterarea   :<span class="st"> </span>num <span class="dv">20502</span>
  $<span class="st"> </span>type      :<span class="st"> </span>chr <span class="st">&quot;Feature&quot;</span></code></pre></div>
-<p><br><br></p>
-</div>
-<div id="from_geojson_schema" class="section level5">
-<h5><strong>FROM_GeoJson_Schema</strong></h5>
-<p>The <strong>FROM_GeoJson_Schema</strong> is the <em>relaxed</em> version of the <strong>FROM_GeoJson</strong> function. By <em>relaxed</em> I mean that it can take property names other than those that the <em>RFC 7946</em> specification determines. The following example shows the output when someone specifies the additional parameter <strong>geometry_name</strong>,</p>
-<p><br></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tmp_str =<span class="st"> '{</span>
-<span class="st">             &quot;name&quot; : &quot;example_name&quot;,</span>
-<span class="st">             &quot;location&quot; : {</span>
-<span class="st">                 &quot;type&quot; : &quot;Point&quot;,</span>
-<span class="st">                 &quot;coordinates&quot; : [ -120.24, 39.21 ]</span>
-<span class="st">               }</span>
-<span class="st">            }'</span>
-
-res =<span class="st"> </span><span class="kw">FROM_GeoJson_Schema</span>(<span class="dt">url_file_string =</span> tmp_str, <span class="dt">geometry_name =</span> <span class="st">&quot;location&quot;</span>)
-
-res</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">$location
-$location$type
-[<span class="dv">1</span>] <span class="st">&quot;Point&quot;</span>
-
-$location$coordinates
-[<span class="dv">1</span>] -<span class="fl">120.24</span>   <span class="fl">39.21</span>
-
-
-$name
-[<span class="dv">1</span>] <span class="st">&quot;example_name&quot;</span></code></pre></div>
-<p><br></p>
-<p>The <strong>geometry_name</strong> takes the property name of the geometry object as input and if set to the default value (“”), then recursion will be used which can be slower especially in case that the dimensions of the geometry object’s coordinates are big. The <strong>FROM_GeoJson_Schema</strong> function is appropriate in cases where the <strong>FROM_GeoJson</strong> function raises an error.</p>
 <p><br><br></p>
 </div>
 <div id="to_geojson" class="section level5">

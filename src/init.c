@@ -17,6 +17,8 @@ extern SEXP geojsonR_Feature_collection_Obj(SEXP, SEXP, SEXP);
 extern SEXP geojsonR_Feature_Obj(SEXP, SEXP, SEXP);
 extern SEXP geojsonR_Features_TO_Collection(SEXP, SEXP);
 extern SEXP geojsonR_Geom_Collection(SEXP, SEXP, SEXP);
+extern SEXP geojsonR_list_files(SEXP, SEXP);
+extern SEXP geojsonR_merge_json(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"geojsonR_dump_geojson",               (DL_FUNC) &geojsonR_dump_geojson,               1},
@@ -28,6 +30,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"geojsonR_Feature_Obj",                (DL_FUNC) &geojsonR_Feature_Obj,                3},
     {"geojsonR_Features_TO_Collection",     (DL_FUNC) &geojsonR_Features_TO_Collection,     2},
     {"geojsonR_Geom_Collection",            (DL_FUNC) &geojsonR_Geom_Collection,            3},
+    {"geojsonR_list_files",                 (DL_FUNC) &geojsonR_list_files,                 2},
+    {"geojsonR_merge_json",                 (DL_FUNC) &geojsonR_merge_json,                 4},
     {NULL, NULL, 0}
 };
 

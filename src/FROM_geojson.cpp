@@ -10,7 +10,7 @@
  *
  * @Notes: reads GeoJson from file / url / character-string
  *
- * @last_modified: July 2017
+ * @last_modified: September 2017
  *
  **/
 
@@ -26,6 +26,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <dirent.h>
 
 #include <R.h>
 #include <Rinternals.h>
@@ -1099,6 +1100,140 @@ Rcpp::List export_From_geojson_schema(std::string input_file, std::string GEOMET
   }
 
   return RES_ALL;
+}
+
+
+
+//==================================================================================== merge multiple json files to a single file
+
+
+// returns the paths of files in a folder
+// http://www.cplusplus.com/forum/unices/3548/
+// (much faster than the base R list.files() function with default settings)
+
+// [[Rcpp::export]]
+std::vector<std::string> list_files( const std::string& path, bool full_path = true) {
+
+  std::vector <std::string> result;
+
+  dirent* de;
+
+  DIR* dp;
+
+  errno = 0;
+
+  dp = opendir( path.empty() ? "." : path.c_str() );
+
+  if (dp) {
+
+    while (true) {
+
+      errno = 0;
+
+      de = readdir( dp );
+
+      if (de == NULL) break;
+
+      std::string tmp = std::string( de->d_name );
+
+      int count = std::count_if(tmp.begin(), tmp.end(),[](char c){ return (std::isalnum(c)); });
+
+      if (count > 0) {
+
+        if (full_path) {
+
+          std::string full_str = path + tmp;
+
+          result.push_back( full_str );}
+
+        else {
+
+          result.push_back( tmp );
+        }
+      }
+    }
+
+    closedir( dp );
+
+    std::sort( result.begin(), result.end() );
+  }
+
+  return result;
+}
+
+
+
+// read 'json-files' (or any kind of .txt file) from a directory and append it to an 'output-file'
+// [ use concat to specify the position of each appended file ( newline, empty space etc. ) ]
+//
+
+// [[Rcpp::export]]
+void merge_json(const std::string& input_folder, std::string output_file, std::string concat_delimiter = "\n", bool verbose = false) {
+
+  arma::wall_clock timer;
+
+  if (verbose) {
+
+    if (verbose) { timer.tic(); Rprintf("\n"); }
+  }
+
+  std::vector<std::string> all_files = list_files(input_folder, true);        // by default return full-paths
+
+  if (all_files.empty()) {
+
+    Rcpp::stop("the folder is empty");
+  }
+
+  std::ofstream out;
+
+  out.open(output_file, std::ios::app);
+
+  for (unsigned int i = 0; i < all_files.size(); i++) {
+
+    std::string data_in;
+
+    std::fstream myfile(all_files[i], std::fstream::in);
+
+    char chs;
+
+    while (myfile >> std::noskipws >> chs) {
+
+      data_in += chs;
+    }
+
+    if (i == 0) {
+
+      out << data_in;}
+
+    else {
+
+      out << concat_delimiter + data_in;
+    }
+
+    if (verbose) {
+
+      std::string tns = std::to_string(all_files.size());
+
+      const char* in_rpr = "\rnumber of files processed: %2d of ";
+
+      char const* pchar = tns.c_str();
+
+      char * RutaFinal = new char[strlen(in_rpr) + strlen(pchar) + 1];    // concatenation of const char* : https://stackoverflow.com/questions/8487337/how-to-concat-two-const-char
+      strcpy(RutaFinal, in_rpr);
+      strcat(RutaFinal, pchar);
+
+      Rprintf(RutaFinal, i + 1);
+    }
+  }
+
+  if (verbose) {
+
+    double n = timer.toc();
+
+    Rprintf("\ttotal.time.in.minutes: %.5f", n / 60.0);
+  }
+
+  out.close();
 }
 
 

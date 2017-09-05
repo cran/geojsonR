@@ -21,6 +21,14 @@ export_From_geojson_schema <- function(input_file, GEOMETRY_OBJECT_NAME = "", av
     .Call('geojsonR_export_From_geojson_schema', PACKAGE = 'geojsonR', input_file, GEOMETRY_OBJECT_NAME, average_coordinates, to_list)
 }
 
+list_files <- function(path, full_path = TRUE) {
+    .Call('geojsonR_list_files', PACKAGE = 'geojsonR', path, full_path)
+}
+
+merge_json <- function(input_folder, output_file, concat_delimiter = "\n", verbose = FALSE) {
+    invisible(.Call('geojsonR_merge_json', PACKAGE = 'geojsonR', input_folder, output_file, concat_delimiter, verbose))
+}
+
 export_To_GeoJson <- function(geometry_object, data_POINTS, data_ARRAYS, data_ARRAY_ARRAYS, data_POLYGON_ARRAYS, stringify = FALSE) {
     .Call('geojsonR_export_To_GeoJson', PACKAGE = 'geojsonR', geometry_object, data_POINTS, data_ARRAYS, data_ARRAY_ARRAYS, data_POLYGON_ARRAYS, stringify)
 }
