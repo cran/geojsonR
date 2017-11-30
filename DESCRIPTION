@@ -1,8 +1,8 @@
 Package: geojsonR
 Type: Package
 Title: A GeoJson Processing Toolkit
-Version: 1.0.3
-Date: 2017-09-05
+Version: 1.0.4
+Date: 2017-11-30
 Author: Lampros Mouselimis <mouselimislampros@gmail.com>
 Maintainer: Lampros Mouselimis <mouselimislampros@gmail.com>
 BugReports: https://github.com/mlampros/geojsonR/issues
@@ -19,6 +19,6 @@ Suggests: testthat, covr, knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 NeedsCompilation: yes
-Packaged: 2017-09-05 11:16:35 UTC; lampros
+Packaged: 2017-11-30 12:38:07 UTC; lampros
 Repository: CRAN
-Date/Publication: 2017-09-05 20:23:32 UTC
+Date/Publication: 2017-11-30 13:49:34 UTC

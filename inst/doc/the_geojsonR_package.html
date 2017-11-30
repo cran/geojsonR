@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Lampros Mouselimis" />
 
-<meta name="date" content="2017-09-05" />
+<meta name="date" content="2017-11-30" />
 
 <title>Processing of GeoJson data in R</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Processing of GeoJson data in R</h1>
 <h4 class="author"><em>Lampros Mouselimis</em></h4>
-<h4 class="date"><em>2017-09-05</em></h4>
+<h4 class="date"><em>2017-11-30</em></h4>
 
 
 
@@ -78,33 +78,33 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong>geojsonR</strong> relies mainly on <a href="https://tools.ietf.org/pdf/rfc7946.pdf">RFC 7946</a>, which is the new standard specification of the GeoJSON format. Moreover, the package takes advantage of a C++11 JSON library (<a href="https://github.com/dropbox/json11">json11</a>) to do the encoding <em>from</em> and <em>to</em> geojson data objects and all functions are exported in R using the <em>Rcpp</em> and <em>RcppArmadillo</em> packages. <br></p>
 <p>The following lines show an <a href="https://tools.ietf.org/pdf/rfc7946.pdf#page=5">example GeoJson object</a> (<em>“feature_collection.geojson”</em>),</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{
-    <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;FeatureCollection&quot;</span>,
-    <span class="st">&quot;features&quot;</span>:<span class="st"> </span>[{
+    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>,
+    <span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{
       
-        <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>,
-         <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{
-             <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Point&quot;</span>,
-             <span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>
+        <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,
+         <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{
+             <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Point&quot;</span>,
+             <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>
 <span class="st">                </span>[<span class="fl">102.0</span>, <span class="fl">0.5</span>]
          },
-         <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{
-         <span class="st">&quot;prop0&quot;</span>:<span class="st"> &quot;value0&quot;</span>
+         <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{
+         <span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>
          }
         }, {
         
-           <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>,
-           <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{
-               <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;LineString&quot;</span>,
-               <span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[
+           <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,
+           <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{
+               <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;LineString&quot;</span>,
+               <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[
                  [<span class="fl">102.0</span>, <span class="fl">0.0</span>],
                  [<span class="fl">103.0</span>, <span class="fl">1.0</span>],
                  [<span class="fl">104.0</span>, <span class="fl">0.0</span>],
                  [<span class="fl">102.0</span>, <span class="fl">0.0</span>]
                  ]
                },
-               <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{
-                <span class="st">&quot;prop0&quot;</span>:<span class="st"> &quot;value0&quot;</span>,
-                <span class="st">&quot;prop1&quot;</span>:<span class="st"> </span><span class="fl">0.0</span>
+               <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{
+                <span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>,
+                <span class="st">&quot;prop1&quot;</span><span class="op">:</span><span class="st"> </span><span class="fl">0.0</span>
                }
         }
     ]
@@ -127,32 +127,32 @@ file_js</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># output :</span>
 
 
-$features
-$features[[<span class="dv">1</span>]]
-$features[[<span class="dv">1</span>]]$geometry
-$features[[<span class="dv">1</span>]]$geometry$type
+<span class="op">$</span>features
+<span class="op">$</span>features[[<span class="dv">1</span>]]
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry<span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;Point&quot;</span>
 
-$features[[<span class="dv">1</span>]]$geometry$coordinates
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry<span class="op">$</span>coordinates
      [,<span class="dv">1</span>] [,<span class="dv">2</span>]
 [<span class="dv">1</span>,]  <span class="dv">102</span>  <span class="fl">0.5</span>
 
 
-$features[[<span class="dv">1</span>]]$properties
-$features[[<span class="dv">1</span>]]$properties$prop0
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>properties
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>properties<span class="op">$</span>prop0
 [<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span>
 
 
-$features[[<span class="dv">1</span>]]$type
+<span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span>
 
 
-$features[[<span class="dv">2</span>]]
-$features[[<span class="dv">2</span>]]$geometry
-$features[[<span class="dv">2</span>]]$geometry$type
+<span class="op">$</span>features[[<span class="dv">2</span>]]
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry<span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;LineString&quot;</span>
 
-$features[[<span class="dv">2</span>]]$geometry$coordinates
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry<span class="op">$</span>coordinates
      [,<span class="dv">1</span>] [,<span class="dv">2</span>]
 [<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">0</span>
 [<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">1</span>
@@ -160,20 +160,20 @@ $features[[<span class="dv">2</span>]]$geometry$coordinates
 [<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">0</span>
 
 
-$features[[<span class="dv">2</span>]]$properties
-$features[[<span class="dv">2</span>]]$properties$prop0
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties<span class="op">$</span>prop0
 [<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span>
 
-$features[[<span class="dv">2</span>]]$properties$prop1
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties<span class="op">$</span>prop1
 [<span class="dv">1</span>] <span class="dv">0</span>
 
 
-$features[[<span class="dv">2</span>]]$type
+<span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span>
 
 
 
-$type
+<span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;FeatureCollection&quot;</span></code></pre></div>
 <p><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># INPUT IS A GeoJson OBJECT (character string)</span>
@@ -190,11 +190,11 @@ str_js =<span class="st"> '{ &quot;type&quot;: &quot;MultiPolygon&quot;, </span>
 char_js =<span class="st"> </span><span class="kw">FROM_GeoJson</span>(<span class="dt">url_file_string =</span> str_js)
 
 char_js</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">$type
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">$</span>type
 [<span class="dv">1</span>] <span class="st">&quot;MultiPolygon&quot;</span>
 
-$coordinates
-$coordinates[[<span class="dv">1</span>]]
+<span class="op">$</span>coordinates
+<span class="op">$</span>coordinates[[<span class="dv">1</span>]]
      [,<span class="dv">1</span>] [,<span class="dv">2</span>]
 [<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">2</span>
 [<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">2</span>
@@ -202,8 +202,8 @@ $coordinates[[<span class="dv">1</span>]]
 [<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">3</span>
 [<span class="dv">5</span>,]  <span class="dv">102</span>    <span class="dv">2</span>
 
-$coordinates[[<span class="dv">2</span>]]
-$coordinates[[<span class="dv">2</span>]][[<span class="dv">1</span>]]
+<span class="op">$</span>coordinates[[<span class="dv">2</span>]]
+<span class="op">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">1</span>]]
      [,<span class="dv">1</span>] [,<span class="dv">2</span>]
 [<span class="dv">1</span>,]  <span class="dv">100</span>    <span class="dv">0</span>
 [<span class="dv">2</span>,]  <span class="dv">101</span>    <span class="dv">0</span>
@@ -211,7 +211,7 @@ $coordinates[[<span class="dv">2</span>]][[<span class="dv">1</span>]]
 [<span class="dv">4</span>,]  <span class="dv">100</span>    <span class="dv">1</span>
 [<span class="dv">5</span>,]  <span class="dv">100</span>    <span class="dv">0</span>
 
-$coordinates[[<span class="dv">2</span>]][[<span class="dv">2</span>]]
+<span class="op">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">2</span>]]
       [,<span class="dv">1</span>] [,<span class="dv">2</span>]
 [<span class="dv">1</span>,] <span class="fl">100.2</span>  <span class="fl">0.2</span>
 [<span class="dv">2</span>,] <span class="fl">100.8</span>  <span class="fl">0.2</span>
@@ -227,71 +227,71 @@ url_js =<span class="st"> </span><span class="kw">FROM_GeoJson</span>(<span clas
 
 <span class="kw">str</span>(url_js)
 
-Warning message:
-closing unused connection <span class="dv">3</span> (https:<span class="er">//</span>raw.githubusercontent.com/mlampros/DataSets/master/california.geojson) </code></pre></div>
+Warning message<span class="op">:</span>
+closing unused connection <span class="dv">3</span> (https<span class="op">:</span><span class="er">//</span>raw.githubusercontent.com<span class="op">/</span>mlampros<span class="op">/</span>DataSets<span class="op">/</span>master<span class="op">/</span>california.geojson) </code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">List of <span class="dv">4</span>
- $<span class="st"> </span>geometry  :List of <span class="dv">2</span>
-  ..$<span class="st"> </span>type       :<span class="st"> </span>chr <span class="st">&quot;MultiPolygon&quot;</span>
-  ..$<span class="st"> </span>coordinates:List of <span class="dv">11</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">56</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">64</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">36</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">24</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">120</span> -<span class="dv">119</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">16</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">42</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> -<span class="dv">119</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">48</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">119</span> -<span class="dv">118</span> -<span class="dv">118</span> -<span class="dv">118</span> -<span class="dv">118</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">11</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">11</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">123</span> -<span class="dv">123</span> -<span class="dv">123</span> -<span class="dv">123</span> -<span class="dv">123</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">9</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> -<span class="dv">122</span> ...
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">1154</span>, <span class="dv">1</span>:<span class="dv">2</span>] -<span class="dv">124</span> -<span class="dv">124</span> -<span class="dv">124</span> -<span class="dv">124</span> -<span class="dv">124</span> ...
- $<span class="st"> </span>id        :<span class="st"> </span>chr <span class="st">&quot;california&quot;</span>
- $<span class="st"> </span>properties:List of <span class="dv">11</span>
-  ..$<span class="st"> </span>abbreviation:<span class="st"> </span>chr <span class="st">&quot;CA&quot;</span>
-  ..$<span class="st"> </span>area        :<span class="st"> </span>num <span class="dv">423968</span>
-  ..$<span class="st"> </span>capital     :<span class="st"> </span>chr <span class="st">&quot;Sacramento&quot;</span>
-  ..$<span class="st"> </span>city        :<span class="st"> </span>chr <span class="st">&quot;Los Angeles&quot;</span>
-  ..$<span class="st"> </span>group       :<span class="st"> </span>chr <span class="st">&quot;US States&quot;</span>
-  ..$<span class="st"> </span>houseseats  :<span class="st"> </span>num <span class="dv">53</span>
-  ..$<span class="st"> </span>landarea    :<span class="st"> </span>num <span class="dv">403466</span>
-  ..$<span class="st"> </span>name        :<span class="st"> </span>chr <span class="st">&quot;California&quot;</span>
-  ..$<span class="st"> </span>population  :<span class="st"> </span>num <span class="dv">38332521</span>
-  ..$<span class="st"> </span>statehood   :<span class="st"> </span>chr <span class="st">&quot;1850-09-09&quot;</span>
-  ..$<span class="st"> </span>waterarea   :<span class="st"> </span>num <span class="dv">20502</span>
- $<span class="st"> </span>type      :<span class="st"> </span>chr <span class="st">&quot;Feature&quot;</span></code></pre></div>
+ <span class="op">$</span><span class="st"> </span>geometry  <span class="op">:</span>List of <span class="dv">2</span>
+  ..<span class="op">$</span><span class="st"> </span>type       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;MultiPolygon&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>coordinates<span class="op">:</span>List of <span class="dv">11</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">56</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">64</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">36</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">24</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">120</span> <span class="op">-</span><span class="dv">119</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">16</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">42</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">119</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">48</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">119</span> <span class="op">-</span><span class="dv">118</span> <span class="op">-</span><span class="dv">118</span> <span class="op">-</span><span class="dv">118</span> <span class="op">-</span><span class="dv">118</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">123</span> <span class="op">-</span><span class="dv">123</span> <span class="op">-</span><span class="dv">123</span> <span class="op">-</span><span class="dv">123</span> <span class="op">-</span><span class="dv">123</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> <span class="op">-</span><span class="dv">122</span> ...
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">1154</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="op">-</span><span class="dv">124</span> <span class="op">-</span><span class="dv">124</span> <span class="op">-</span><span class="dv">124</span> <span class="op">-</span><span class="dv">124</span> <span class="op">-</span><span class="dv">124</span> ...
+ <span class="op">$</span><span class="st"> </span>id        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;california&quot;</span>
+ <span class="op">$</span><span class="st"> </span>properties<span class="op">:</span>List of <span class="dv">11</span>
+  ..<span class="op">$</span><span class="st"> </span>abbreviation<span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;CA&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>area        <span class="op">:</span><span class="st"> </span>num <span class="dv">423968</span>
+  ..<span class="op">$</span><span class="st"> </span>capital     <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Sacramento&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>city        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Los Angeles&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>group       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;US States&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>houseseats  <span class="op">:</span><span class="st"> </span>num <span class="dv">53</span>
+  ..<span class="op">$</span><span class="st"> </span>landarea    <span class="op">:</span><span class="st"> </span>num <span class="dv">403466</span>
+  ..<span class="op">$</span><span class="st"> </span>name        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;California&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>population  <span class="op">:</span><span class="st"> </span>num <span class="dv">38332521</span>
+  ..<span class="op">$</span><span class="st"> </span>statehood   <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;1850-09-09&quot;</span>
+  ..<span class="op">$</span><span class="st"> </span>waterarea   <span class="op">:</span><span class="st"> </span>num <span class="dv">20502</span>
+ <span class="op">$</span><span class="st"> </span>type      <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Feature&quot;</span></code></pre></div>
 <p><br><br></p>
 </div>
 <div id="to_geojson" class="section level5">
 <h5><strong>TO_GeoJson</strong></h5>
 <p><br></p>
 <p>The <strong>TO_GeoJson</strong> function is an <a href="https://cran.r-project.org/package=R6">R6 class</a>, which takes as input a <em>vector</em> (in case of a <em>Point</em>) or a <em>list</em> (in case of the rest geometry objects) and converts it to a GeoJson object (named list). The output can also include the data in form of a geojson character string if the argument <em>stringify</em> is TRUE. The following code chunk shows the output for a polygon with interior rings,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">init =<span class="st"> </span>TO_GeoJson$<span class="kw">new</span>()
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">init =<span class="st"> </span>TO_GeoJson<span class="op">$</span><span class="kw">new</span>()
 
 polygon_WITH_dat =<span class="st"> </span><span class="kw">list</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>), <span class="kw">c</span>(<span class="dv">200</span>, <span class="fl">2.01</span>), <span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.0</span>), <span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>)),
 
                         <span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.8</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.9</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>)))
 
-polygon_with =<span class="st"> </span>init$<span class="kw">Polygon</span>(polygon_WITH_dat, <span class="dt">stringify =</span> <span class="ot">TRUE</span>)
+polygon_with =<span class="st"> </span>init<span class="op">$</span><span class="kw">Polygon</span>(polygon_WITH_dat, <span class="dt">stringify =</span> <span class="ot">TRUE</span>)
 
 <span class="kw">str</span>(polygon_with)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">List of <span class="dv">3</span>
- $<span class="st"> </span>json_dump  :<span class="st"> </span>chr <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">coordinates</span><span class="ch">\&quot;</span><span class="st">: [[[100, 1.01], [200, 2.0099999999999998], [100, 1], [100, 1.01]], [[50, 0.5], [50, 0.80000000000000004], [50,&quot;</span>|<span class="st"> </span>__truncated__
- $<span class="st"> </span>type       :<span class="st"> </span>chr <span class="st">&quot;Polygon&quot;</span>
- $<span class="st"> </span>coordinates:List of <span class="dv">2</span>
-  ..$<span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">200</span> <span class="fl">2.01</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">100</span> <span class="dv">1</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span>
-  ..$<span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.8</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.9</span>
-  .. ..$<span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span>:<span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></code></pre></div>
+ <span class="op">$</span><span class="st"> </span>json_dump  <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">coordinates</span><span class="ch">\&quot;</span><span class="st">: [[[100, 1.01], [200, 2.0099999999999998], [100, 1], [100, 1.01]], [[50, 0.5], [50, 0.80000000000000004], [50,&quot;</span><span class="op">|</span><span class="st"> </span>__truncated__
+ <span class="op">$</span><span class="st"> </span>type       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Polygon&quot;</span>
+ <span class="op">$</span><span class="st"> </span>coordinates<span class="op">:</span>List of <span class="dv">2</span>
+  ..<span class="op">$</span><span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">200</span> <span class="fl">2.01</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="dv">1</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span>
+  ..<span class="op">$</span><span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.8</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.9</span>
+  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># if &quot;stringify = TRUE&quot;</span>
 
-<span class="kw">cat</span>(polygon_with$json_dump)
+<span class="kw">cat</span>(polygon_with<span class="op">$</span>json_dump)
 
-{<span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[[[<span class="dv">100</span>, <span class="fl">1.01</span>], [<span class="dv">200</span>, <span class="fl">2.0099999999999998</span>], [<span class="dv">100</span>, <span class="dv">1</span>], [<span class="dv">100</span>, <span class="fl">1.01</span>]], [[<span class="dv">50</span>, <span class="fl">0.5</span>], [<span class="dv">50</span>, <span class="fl">0.80000000000000004</span>], [<span class="dv">50</span>, <span class="fl">0.90000000000000002</span>], [<span class="dv">50</span>, <span class="fl">0.5</span>]]], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Polygon&quot;</span>}</code></pre></div>
+{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="dv">100</span>, <span class="fl">1.01</span>], [<span class="dv">200</span>, <span class="fl">2.0099999999999998</span>], [<span class="dv">100</span>, <span class="dv">1</span>], [<span class="dv">100</span>, <span class="fl">1.01</span>]], [[<span class="dv">50</span>, <span class="fl">0.5</span>], [<span class="dv">50</span>, <span class="fl">0.80000000000000004</span>], [<span class="dv">50</span>, <span class="fl">0.90000000000000002</span>], [<span class="dv">50</span>, <span class="fl">0.5</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}</code></pre></div>
 <p><br></p>
 <p>The package documentation includes examples on how to build geojson objects for all geometries ( Point, MultiPoint, LineString, MultiLineString, Polygon (with or without interior rings), MultiPolygon, GeometryCollection, Feature and FeatureCollection ).</p>
 <p><br><br></p>
@@ -304,7 +304,7 @@ polygon_with =<span class="st"> </span>init$<span class="kw">Polygon</span>(poly
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dump_js =<span class="st"> </span><span class="kw">Dump_From_GeoJson</span>(<span class="dt">url_file =</span> <span class="st">&quot;feature_collection.geojson&quot;</span>)
 
 <span class="kw">cat</span>(dump_js)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{<span class="st">&quot;features&quot;</span>:<span class="st"> </span>[{<span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[<span class="dv">102</span>, <span class="fl">0.5</span>], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Point&quot;</span>}, <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{<span class="st">&quot;prop0&quot;</span>:<span class="st"> &quot;value0&quot;</span>}, <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[[<span class="dv">102</span>, <span class="dv">0</span>], [<span class="dv">103</span>, <span class="dv">1</span>], [<span class="dv">104</span>, <span class="dv">0</span>], [<span class="dv">105</span>, <span class="dv">1</span>]], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;LineString&quot;</span>}, <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{<span class="st">&quot;prop0&quot;</span>:<span class="st"> &quot;value0&quot;</span>, <span class="st">&quot;prop1&quot;</span>:<span class="st"> </span><span class="dv">0</span>}, <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;FeatureCollection&quot;</span>}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{<span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{<span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="dv">102</span>, <span class="fl">0.5</span>], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Point&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[<span class="dv">102</span>, <span class="dv">0</span>], [<span class="dv">103</span>, <span class="dv">1</span>], [<span class="dv">104</span>, <span class="dv">0</span>], [<span class="dv">105</span>, <span class="dv">1</span>]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;LineString&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>, <span class="st">&quot;prop1&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">0</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>}</code></pre></div>
 <p><br></p>
 <p>The same applies to url files beginning from <em>http..</em>.</p>
 <p><br><br></p>
@@ -317,58 +317,58 @@ polygon_with =<span class="st"> </span>init$<span class="kw">Polygon</span>(poly
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># &quot;Feature1.geojson&quot;</span>
 
 {
- <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>,
+ <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,
  
- <span class="st">&quot;id&quot;</span>:<span class="st"> </span><span class="dv">1</span>,
+ <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>,
  
- <span class="st">&quot;bbox&quot;</span>:<span class="st"> </span>[-<span class="fl">10.0</span>, -<span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],
+ <span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],
  
- <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{
+ <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{
  
-    <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Polygon&quot;</span>,
+    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>,
     
-    <span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[
+    <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[
     
          [
-            [-<span class="fl">10.0</span>, -<span class="fl">10.0</span>], [<span class="fl">10.0</span>, -<span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [-<span class="fl">10.0</span>, -<span class="fl">10.0</span>]
+            [<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>]
          ]
       ]
     },
 
-    <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{
+    <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{
   
-      <span class="st">&quot;prop_1&quot;</span>:<span class="st"> &quot;addr1&quot;</span>,
+      <span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr1&quot;</span>,
   
-      <span class="st">&quot;prop_2&quot;</span>:<span class="st"> </span><span class="dv">1</span>
+      <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>
     }
 }</code></pre></div>
 <p><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># &quot;Feature2.geojson&quot;</span>
 
 {
- <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>,
+ <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,
  
- <span class="st">&quot;id&quot;</span>:<span class="st"> </span><span class="dv">2</span>,
+ <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>,
  
- <span class="st">&quot;bbox&quot;</span>:<span class="st"> </span>[-<span class="fl">10.0</span>, -<span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],
+ <span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],
  
- <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{
+ <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{
  
-    <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Polygon&quot;</span>,
+    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>,
     
-    <span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[
+    <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[
     
          [
-            [-<span class="fl">10.0</span>, -<span class="fl">10.0</span>], [<span class="fl">10.0</span>, -<span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [-<span class="fl">10.0</span>, -<span class="fl">10.0</span>]
+            [<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="op">-</span><span class="fl">10.0</span>, <span class="op">-</span><span class="fl">10.0</span>]
          ]
       ]
     },
 
-    <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{
+    <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{
   
-      <span class="st">&quot;prop_1&quot;</span>:<span class="st"> &quot;addr2&quot;</span>,
+      <span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr2&quot;</span>,
   
-      <span class="st">&quot;prop_2&quot;</span>:<span class="st"> </span><span class="dv">2</span>
+      <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>
     }
 }</code></pre></div>
 <p><br></p>
@@ -379,7 +379,7 @@ polygon_with =<span class="st"> </span>init$<span class="kw">Polygon</span>(poly
 res_fcol =<span class="st"> </span><span class="kw">Features_2Collection</span>(vec_in, <span class="dt">bbox_vec =</span> <span class="ot">NULL</span>)
 
 <span class="kw">cat</span>(res_fcol)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{<span class="st">&quot;bbox&quot;</span>:<span class="st"> </span>[], <span class="st">&quot;features&quot;</span>:<span class="st"> </span>[{<span class="st">&quot;bbox&quot;</span>:<span class="st"> </span>[-<span class="dv">10</span>, -<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[[[-<span class="dv">10</span>, -<span class="dv">10</span>], [<span class="dv">10</span>, -<span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [-<span class="dv">10</span>, -<span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span>:<span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span>:<span class="st"> &quot;addr1&quot;</span>, <span class="st">&quot;prop_2&quot;</span>:<span class="st"> </span><span class="dv">1</span>}, <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;bbox&quot;</span>:<span class="st"> </span>[-<span class="dv">10</span>, -<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span>:<span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span>:<span class="st"> </span>[[[-<span class="dv">10</span>, -<span class="dv">10</span>], [<span class="dv">10</span>, -<span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [-<span class="dv">10</span>, -<span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span>:<span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;properties&quot;</span>:<span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span>:<span class="st"> &quot;addr2&quot;</span>, <span class="st">&quot;prop_2&quot;</span>:<span class="st"> </span><span class="dv">2</span>}, <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span>:<span class="st"> &quot;FeatureCollection&quot;</span>}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">{<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[], <span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr1&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr2&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>}</code></pre></div>
 <p><br><br></p>
 </div>
 <div id="web-applications-using-shiny-leaflet-geojsonr-and-nominatim" class="section level5">
@@ -448,7 +448,7 @@ res_fcol =<span class="st"> </span><span class="kw">Features_2Collection</span>(
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
