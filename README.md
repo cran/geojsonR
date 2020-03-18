@@ -1,4 +1,5 @@
 
+
 ## geojsonR
 <br>
 
@@ -15,12 +16,12 @@ install.packages("geojsonR")
 ```
 <br>
 
-and to download the latest version from Github use the *install_github* function of the devtools package,
+and to download the latest version from Github use the *install_github* function of the *remotes* package,
 <br><br>
 
 ```R
 
-devtools::install_github('mlampros/geojsonR')
+remotes::install_github('mlampros/geojsonR')
 
 
 ```
