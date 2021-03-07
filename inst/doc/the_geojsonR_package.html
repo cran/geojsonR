@@ -12,10 +12,35 @@
 
 <meta name="author" content="Lampros Mouselimis" />
 
-<meta name="date" content="2020-03-18" />
+<meta name="date" content="2021-03-06" />
 
 <title>Processing of GeoJson data in R</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -106,6 +131,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -303,7 +329,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Processing of GeoJson data in R</h1>
 <h4 class="author">Lampros Mouselimis</h4>
-<h4 class="date">2020-03-18</h4>
+<h4 class="date">2021-03-06</h4>
 
 
 
@@ -624,14 +650,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>shiny::runGitHub(‘shiny-server’, ‘mlampros’, subdir = ‘geocoding_nominatim’)</li>
 <li>shiny::runGitHub(‘shiny-server’, ‘mlampros’, subdir = ‘geocoding_nominatim_reverse’)</li>
 </ul>
-<p>or follow the web-links using the <a href="http://www.shinyapps.io/">shinyapps.io</a> service,</p>
+<p>or follow the web-links using the <a href="https://www.shinyapps.io/">shinyapps.io</a> service,</p>
 <ul>
 <li><a href="https://lampros.shinyapps.io/shiny_geocoding/" class="uri">https://lampros.shinyapps.io/shiny_geocoding/</a></li>
 <li><a href="https://lampros.shinyapps.io/shiny_geojson/" class="uri">https://lampros.shinyapps.io/shiny_geojson/</a></li>
 <li><a href="https://lampros.shinyapps.io/shiny_reverse_geocoding/" class="uri">https://lampros.shinyapps.io/shiny_reverse_geocoding/</a></li>
 </ul>
 <p>The latter service is limited to 25 active hours per month (for free accounts), thus if the limit is exceeded then the applications won’t be available to the end users.</p>
-<p>I won’t go into detail about <a href="https://shiny.rstudio.com/">shiny</a> and <a href="https://rstudio.github.io/leaflet/">leaflet</a>, because both packages are well documented and users can find information on how to include them in their projects. On the other hand, “<em>Nominatim</em> is a tool to search OpenStreetMap (OSM) data by name and address and to generate synthetic addresses of OSM points (reverse geocoding). It can be found at <em>nominatim.openstreetmap.org</em>. Nominatim is also used as one of the sources for the search box on the OpenStreetMap home page. Several companies provide hosted instances of Nominatim that you can query via an API.” More information on how to use <em>Nominatim</em> can be found at <a href="http://wiki.openstreetmap.org/wiki/Nominatim" class="uri">http://wiki.openstreetmap.org/wiki/Nominatim</a>).</p>
+<p>I won’t go into detail about <a href="https://shiny.rstudio.com/">shiny</a> and <a href="https://rstudio.github.io/leaflet/">leaflet</a>, because both packages are well documented and users can find information on how to include them in their projects. On the other hand, “<em>Nominatim</em> is a tool to search OpenStreetMap (OSM) data by name and address and to generate synthetic addresses of OSM points (reverse geocoding). It can be found at <em>nominatim.openstreetmap.org</em>. Nominatim is also used as one of the sources for the search box on the OpenStreetMap home page. Several companies provide hosted instances of Nominatim that you can query via an API.” More information on how to use <em>Nominatim</em> can be found at <a href="https://wiki.openstreetmap.org/wiki/Nominatim" class="uri">https://wiki.openstreetmap.org/wiki/Nominatim</a>).</p>
 <p><br></p>
 </div>
 <div id="geocoding_geojson" class="section level5">
