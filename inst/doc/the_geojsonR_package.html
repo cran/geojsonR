@@ -12,26 +12,11 @@
 
 <meta name="author" content="Lampros Mouselimis" />
 
-<meta name="date" content="2021-05-03" />
+<meta name="date" content="2023-01-12" />
 
 <title>Processing of GeoJson data in R</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
-  }
-});
-</script>
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -43,21 +28,29 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -77,7 +70,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -117,13 +110,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -135,187 +135,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 700px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 1.35;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 10px;
-padding: 4px;
-width: 400px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table {
-margin: 1em auto;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table, table th, table td {
-border-left-style: none;
-border-right-style: none;
-}
-table thead, table tr.even {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 0.25em 0.75em;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f7f7f7;
-border-radius: 3px;
-color: #333;
-white-space: pre-wrap; 
-}
-pre {
-border-radius: 3px;
-margin: 5px 0px 10px 0px;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: #f7f7f7;
-}
-code {
-font-family: Consolas, Monaco, 'Courier New', monospace;
-font-size: 85%;
-}
-p > code, li > code {
-padding: 2px 0px;
-}
-div.figure {
-text-align: center;
-}
-img {
-background-color: #FFFFFF;
-padding: 2px;
-border: 1px solid #DDDDDD;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f7f7f7;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f7f7f7;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f7f7f7;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
-
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -329,228 +149,228 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Processing of GeoJson data in R</h1>
 <h4 class="author">Lampros Mouselimis</h4>
-<h4 class="date">2021-05-03</h4>
+<h4 class="date">2023-01-12</h4>
 
 
 
 <p>“<a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON</a> is an open standard format designed for representing simple geographical features, along with their non-spatial attributes, based on JavaScript Object Notation. The features include points (therefore <em>addresses</em> and <em>locations</em>), line strings (therefore <em>streets</em>, <em>highways</em> and <em>boundaries</em>), polygons (<em>countries</em>, <em>provinces</em>, <em>tracts of land</em>), and multi-part collections of these types. GeoJSON features need not represent entities of the physical world only; <em>mobile routing</em> and <em>navigation apps</em>, for example, might describe their service coverage using GeoJSON. The GeoJSON format differs from other GIS standards in that it was written and is maintained not by a formal standards organization, but by an Internet working group of developers.” <br></p>
-<p><strong>geojsonR</strong> relies mainly on <a href="https://tools.ietf.org/pdf/rfc7946.pdf">RFC 7946</a>, which is the new standard specification of the GeoJSON format. Moreover, the package takes advantage of a C++11 JSON library (<a href="https://github.com/dropbox/json11">json11</a>) to do the encoding <em>from</em> and <em>to</em> geojson data objects and all functions are exported in R using the <em>Rcpp</em> and <em>RcppArmadillo</em> packages. <br></p>
-<p>The following lines show an <a href="https://tools.ietf.org/pdf/rfc7946.pdf#page=5">example GeoJson object</a> (<em>“feature_collection.geojson”</em>),</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>{</span>
-<span id="cb1-2"><a href="#cb1-2"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>,</span>
-<span id="cb1-3"><a href="#cb1-3"></a>    <span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{</span>
-<span id="cb1-4"><a href="#cb1-4"></a>      </span>
-<span id="cb1-5"><a href="#cb1-5"></a>        <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,</span>
-<span id="cb1-6"><a href="#cb1-6"></a>         <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb1-7"><a href="#cb1-7"></a>             <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Point&quot;</span>,</span>
-<span id="cb1-8"><a href="#cb1-8"></a>             <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="st">                </span>[<span class="fl">102.0</span>, <span class="fl">0.5</span>]</span>
-<span id="cb1-10"><a href="#cb1-10"></a>         },</span>
-<span id="cb1-11"><a href="#cb1-11"></a>         <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb1-12"><a href="#cb1-12"></a>         <span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a>         }</span>
-<span id="cb1-14"><a href="#cb1-14"></a>        }, {</span>
-<span id="cb1-15"><a href="#cb1-15"></a>        </span>
-<span id="cb1-16"><a href="#cb1-16"></a>           <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,</span>
-<span id="cb1-17"><a href="#cb1-17"></a>           <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb1-18"><a href="#cb1-18"></a>               <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;LineString&quot;</span>,</span>
-<span id="cb1-19"><a href="#cb1-19"></a>               <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[</span>
-<span id="cb1-20"><a href="#cb1-20"></a>                 [<span class="fl">102.0</span>, <span class="fl">0.0</span>],</span>
-<span id="cb1-21"><a href="#cb1-21"></a>                 [<span class="fl">103.0</span>, <span class="fl">1.0</span>],</span>
-<span id="cb1-22"><a href="#cb1-22"></a>                 [<span class="fl">104.0</span>, <span class="fl">0.0</span>],</span>
-<span id="cb1-23"><a href="#cb1-23"></a>                 [<span class="fl">102.0</span>, <span class="fl">0.0</span>]</span>
-<span id="cb1-24"><a href="#cb1-24"></a>                 ]</span>
-<span id="cb1-25"><a href="#cb1-25"></a>               },</span>
-<span id="cb1-26"><a href="#cb1-26"></a>               <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb1-27"><a href="#cb1-27"></a>                <span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>,</span>
-<span id="cb1-28"><a href="#cb1-28"></a>                <span class="st">&quot;prop1&quot;</span><span class="op">:</span><span class="st"> </span><span class="fl">0.0</span></span>
-<span id="cb1-29"><a href="#cb1-29"></a>               }</span>
-<span id="cb1-30"><a href="#cb1-30"></a>        }</span>
-<span id="cb1-31"><a href="#cb1-31"></a>    ]</span>
-<span id="cb1-32"><a href="#cb1-32"></a>}</span></code></pre></div>
+<p><strong>geojsonR</strong> relies mainly on <a href="https://datatracker.ietf.org/doc/pdf/rfc7946.pdf">RFC 7946</a>, which is the new standard specification of the GeoJSON format. Moreover, the package takes advantage of a C++11 JSON library (<a href="https://github.com/dropbox/json11">json11</a>) to do the encoding <em>from</em> and <em>to</em> geojson data objects and all functions are exported in R using the <em>Rcpp</em> and <em>RcppArmadillo</em> packages. <br></p>
+<p>The following lines show an <a href="https://datatracker.ietf.org/doc/pdf/rfc7946.pdf#page=5">example GeoJson object</a> (<em>“feature_collection.geojson”</em>),</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;FeatureCollection&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;features&quot;</span><span class="sc">:</span> [{</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Point&quot;</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                [<span class="fl">102.0</span>, <span class="fl">0.5</span>]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>         },</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;prop0&quot;</span><span class="sc">:</span> <span class="st">&quot;value0&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         }</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        }, {</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;LineString&quot;</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                 [<span class="fl">102.0</span>, <span class="fl">0.0</span>],</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                 [<span class="fl">103.0</span>, <span class="fl">1.0</span>],</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                 [<span class="fl">104.0</span>, <span class="fl">0.0</span>],</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>                 [<span class="fl">102.0</span>, <span class="fl">0.0</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                 ]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>               },</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;prop0&quot;</span><span class="sc">:</span> <span class="st">&quot;value0&quot;</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;prop1&quot;</span><span class="sc">:</span> <span class="fl">0.0</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>               }</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><br> The purpose of this package was not only the implementation of functions to convert from and to geojson objects, but also the development of web applications based on geojson objects / data, which I’ll explain later in the Vignette.</p>
 <p><br></p>
 <div id="from_geojson" class="section level5">
 <h5><strong>FROM_GeoJson</strong></h5>
 <p><br></p>
 <p>The <strong>FROM_GeoJson</strong> function can take as input a <em>path to a file</em>, <em>a valid url</em> (beginning from http..) or a <em>GeoJson object in form of a character string</em>. The output is a named list and the resulted <em>coordinates</em> member is a matrix, as the following code chunks illustrate, <br></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># assuming that the data is saved in the previously mentioned &quot;feature_collection.geojson&quot;</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">library</span>(geojsonR)</span>
-<span id="cb2-4"><a href="#cb2-4"></a></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># INPUT IS A PATH TO A FILE</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a></span>
-<span id="cb2-7"><a href="#cb2-7"></a>file_js =<span class="st"> </span><span class="kw">FROM_GeoJson</span>(<span class="dt">url_file_string =</span> <span class="st">&quot;feature_collection.geojson&quot;</span>)</span>
-<span id="cb2-8"><a href="#cb2-8"></a></span>
-<span id="cb2-9"><a href="#cb2-9"></a>file_js</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># output :</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a></span>
-<span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="op">$</span>features</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="op">$</span>features[[<span class="dv">1</span>]]</span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry</span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry<span class="op">$</span>type</span>
-<span id="cb3-8"><a href="#cb3-8"></a>[<span class="dv">1</span>] <span class="st">&quot;Point&quot;</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>geometry<span class="op">$</span>coordinates</span>
-<span id="cb3-11"><a href="#cb3-11"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
-<span id="cb3-12"><a href="#cb3-12"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>  <span class="fl">0.5</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a></span>
-<span id="cb3-14"><a href="#cb3-14"></a></span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>properties</span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>properties<span class="op">$</span>prop0</span>
-<span id="cb3-17"><a href="#cb3-17"></a>[<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a></span>
-<span id="cb3-19"><a href="#cb3-19"></a></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="op">$</span>features[[<span class="dv">1</span>]]<span class="op">$</span>type</span>
-<span id="cb3-21"><a href="#cb3-21"></a>[<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a></span>
-<span id="cb3-23"><a href="#cb3-23"></a></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="op">$</span>features[[<span class="dv">2</span>]]</span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry</span>
-<span id="cb3-26"><a href="#cb3-26"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry<span class="op">$</span>type</span>
-<span id="cb3-27"><a href="#cb3-27"></a>[<span class="dv">1</span>] <span class="st">&quot;LineString&quot;</span></span>
-<span id="cb3-28"><a href="#cb3-28"></a></span>
-<span id="cb3-29"><a href="#cb3-29"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>geometry<span class="op">$</span>coordinates</span>
-<span id="cb3-30"><a href="#cb3-30"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
-<span id="cb3-31"><a href="#cb3-31"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">0</span></span>
-<span id="cb3-32"><a href="#cb3-32"></a>[<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">1</span></span>
-<span id="cb3-33"><a href="#cb3-33"></a>[<span class="dv">3</span>,]  <span class="dv">104</span>    <span class="dv">0</span></span>
-<span id="cb3-34"><a href="#cb3-34"></a>[<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">0</span></span>
-<span id="cb3-35"><a href="#cb3-35"></a></span>
-<span id="cb3-36"><a href="#cb3-36"></a></span>
-<span id="cb3-37"><a href="#cb3-37"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties</span>
-<span id="cb3-38"><a href="#cb3-38"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties<span class="op">$</span>prop0</span>
-<span id="cb3-39"><a href="#cb3-39"></a>[<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span></span>
-<span id="cb3-40"><a href="#cb3-40"></a></span>
-<span id="cb3-41"><a href="#cb3-41"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>properties<span class="op">$</span>prop1</span>
-<span id="cb3-42"><a href="#cb3-42"></a>[<span class="dv">1</span>] <span class="dv">0</span></span>
-<span id="cb3-43"><a href="#cb3-43"></a></span>
-<span id="cb3-44"><a href="#cb3-44"></a></span>
-<span id="cb3-45"><a href="#cb3-45"></a><span class="op">$</span>features[[<span class="dv">2</span>]]<span class="op">$</span>type</span>
-<span id="cb3-46"><a href="#cb3-46"></a>[<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span></span>
-<span id="cb3-47"><a href="#cb3-47"></a></span>
-<span id="cb3-48"><a href="#cb3-48"></a></span>
-<span id="cb3-49"><a href="#cb3-49"></a></span>
-<span id="cb3-50"><a href="#cb3-50"></a><span class="op">$</span>type</span>
-<span id="cb3-51"><a href="#cb3-51"></a>[<span class="dv">1</span>] <span class="st">&quot;FeatureCollection&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assuming that the data is saved in the previously mentioned &quot;feature_collection.geojson&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geojsonR)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># INPUT IS A PATH TO A FILE</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>file_js <span class="ot">=</span> <span class="fu">FROM_GeoJson</span>(<span class="at">url_file_string =</span> <span class="st">&quot;feature_collection.geojson&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>file_js</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># output :</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>geometry</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>geometry<span class="sc">$</span>type</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;Point&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>geometry<span class="sc">$</span>coordinates</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>  <span class="fl">0.5</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties<span class="sc">$</span>prop0</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>type</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>geometry</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>geometry<span class="sc">$</span>type</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;LineString&quot;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>geometry<span class="sc">$</span>coordinates</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">0</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">1</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,]  <span class="dv">104</span>    <span class="dv">0</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">0</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>properties</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>properties<span class="sc">$</span>prop0</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;value0&quot;</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>properties<span class="sc">$</span>prop1</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">0</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>features[[<span class="dv">2</span>]]<span class="sc">$</span>type</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;Feature&quot;</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>type</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;FeatureCollection&quot;</span></span></code></pre></div>
 <p><br></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># INPUT IS A GeoJson OBJECT (character string)</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a>str_js =<span class="st"> &#39;{ &quot;type&quot;: &quot;MultiPolygon&quot;, </span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="st">            &quot;coordinates&quot;: [</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="st">                [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="st">                [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="st">                 [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="st">                ]</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="st">}&#39;</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a></span>
-<span id="cb4-11"><a href="#cb4-11"></a></span>
-<span id="cb4-12"><a href="#cb4-12"></a>char_js =<span class="st"> </span><span class="kw">FROM_GeoJson</span>(<span class="dt">url_file_string =</span> str_js)</span>
-<span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a>char_js</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="op">$</span>type</span>
-<span id="cb5-2"><a href="#cb5-2"></a>[<span class="dv">1</span>] <span class="st">&quot;MultiPolygon&quot;</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="op">$</span>coordinates</span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="op">$</span>coordinates[[<span class="dv">1</span>]]</span>
-<span id="cb5-6"><a href="#cb5-6"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
-<span id="cb5-7"><a href="#cb5-7"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">2</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a>[<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">2</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a>[<span class="dv">3</span>,]  <span class="dv">103</span>    <span class="dv">3</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a>[<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">3</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a>[<span class="dv">5</span>,]  <span class="dv">102</span>    <span class="dv">2</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="op">$</span>coordinates[[<span class="dv">2</span>]]</span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="op">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">1</span>]]</span>
-<span id="cb5-15"><a href="#cb5-15"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
-<span id="cb5-16"><a href="#cb5-16"></a>[<span class="dv">1</span>,]  <span class="dv">100</span>    <span class="dv">0</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a>[<span class="dv">2</span>,]  <span class="dv">101</span>    <span class="dv">0</span></span>
-<span id="cb5-18"><a href="#cb5-18"></a>[<span class="dv">3</span>,]  <span class="dv">101</span>    <span class="dv">1</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a>[<span class="dv">4</span>,]  <span class="dv">100</span>    <span class="dv">1</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a>[<span class="dv">5</span>,]  <span class="dv">100</span>    <span class="dv">0</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a></span>
-<span id="cb5-22"><a href="#cb5-22"></a><span class="op">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">2</span>]]</span>
-<span id="cb5-23"><a href="#cb5-23"></a>      [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
-<span id="cb5-24"><a href="#cb5-24"></a>[<span class="dv">1</span>,] <span class="fl">100.2</span>  <span class="fl">0.2</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a>[<span class="dv">2</span>,] <span class="fl">100.8</span>  <span class="fl">0.2</span></span>
-<span id="cb5-26"><a href="#cb5-26"></a>[<span class="dv">3</span>,] <span class="fl">100.8</span>  <span class="fl">0.8</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a>[<span class="dv">4</span>,] <span class="fl">100.2</span>  <span class="fl">0.8</span></span>
-<span id="cb5-28"><a href="#cb5-28"></a>[<span class="dv">5</span>,] <span class="fl">100.2</span>  <span class="fl">0.2</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># INPUT IS A GeoJson OBJECT (character string)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>str_js <span class="ot">=</span> <span class="st">&#39;{ &quot;type&quot;: &quot;MultiPolygon&quot;, </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;coordinates&quot;: [</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">                [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">                [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">                 [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">                ]</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">}&#39;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>char_js <span class="ot">=</span> <span class="fu">FROM_GeoJson</span>(<span class="at">url_file_string =</span> str_js)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>char_js</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>type</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">&quot;MultiPolygon&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>coordinates</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>coordinates[[<span class="dv">1</span>]]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]  <span class="dv">102</span>    <span class="dv">2</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,]  <span class="dv">103</span>    <span class="dv">2</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,]  <span class="dv">103</span>    <span class="dv">3</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,]  <span class="dv">102</span>    <span class="dv">3</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>[<span class="dv">5</span>,]  <span class="dv">102</span>    <span class="dv">2</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>coordinates[[<span class="dv">2</span>]]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">1</span>]]</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]  <span class="dv">100</span>    <span class="dv">0</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,]  <span class="dv">101</span>    <span class="dv">0</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,]  <span class="dv">101</span>    <span class="dv">1</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,]  <span class="dv">100</span>    <span class="dv">1</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>[<span class="dv">5</span>,]  <span class="dv">100</span>    <span class="dv">0</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>coordinates[[<span class="dv">2</span>]][[<span class="dv">2</span>]]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      [,<span class="dv">1</span>] [,<span class="dv">2</span>]</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,] <span class="fl">100.2</span>  <span class="fl">0.2</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,] <span class="fl">100.8</span>  <span class="fl">0.2</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,] <span class="fl">100.8</span>  <span class="fl">0.8</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,] <span class="fl">100.2</span>  <span class="fl">0.8</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>[<span class="dv">5</span>,] <span class="fl">100.2</span>  <span class="fl">0.2</span></span></code></pre></div>
 <p><br></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># INPUT IS A URL (beginning from http..)</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3"></a>url_path =<span class="st"> &quot;https://raw.githubusercontent.com/mlampros/DataSets/master/california.geojson&quot;</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5"></a>url_js =<span class="st"> </span><span class="kw">FROM_GeoJson</span>(<span class="dt">url_file_string =</span> url_path)</span>
-<span id="cb6-6"><a href="#cb6-6"></a></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="kw">str</span>(url_js)</span>
-<span id="cb6-8"><a href="#cb6-8"></a></span>
-<span id="cb6-9"><a href="#cb6-9"></a>Warning message<span class="op">:</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>closing unused connection <span class="dv">3</span> (https<span class="op">:</span><span class="er">//</span>raw.githubusercontent.com<span class="op">/</span>mlampros<span class="op">/</span>DataSets<span class="op">/</span>master<span class="op">/</span>california.geojson) </span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>List of <span class="dv">4</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a> <span class="op">$</span><span class="st"> </span>geometry  <span class="op">:</span>List of <span class="dv">2</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a>  ..<span class="op">$</span><span class="st"> </span>type       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;MultiPolygon&quot;</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a>  ..<span class="op">$</span><span class="st"> </span>coordinates<span class="op">:</span>List of <span class="dv">11</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">56</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> ...</span>
-<span id="cb7-6"><a href="#cb7-6"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">64</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> ...</span>
-<span id="cb7-7"><a href="#cb7-7"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">36</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> ...</span>
-<span id="cb7-8"><a href="#cb7-8"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">24</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-120</span> <span class="dv">-119</span> ...</span>
-<span id="cb7-9"><a href="#cb7-9"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">16</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> ...</span>
-<span id="cb7-10"><a href="#cb7-10"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">42</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> <span class="dv">-119</span> ...</span>
-<span id="cb7-11"><a href="#cb7-11"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">48</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-119</span> <span class="dv">-118</span> <span class="dv">-118</span> <span class="dv">-118</span> <span class="dv">-118</span> ...</span>
-<span id="cb7-12"><a href="#cb7-12"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> ...</span>
-<span id="cb7-13"><a href="#cb7-13"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-123</span> <span class="dv">-123</span> <span class="dv">-123</span> <span class="dv">-123</span> <span class="dv">-123</span> ...</span>
-<span id="cb7-14"><a href="#cb7-14"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> <span class="dv">-122</span> ...</span>
-<span id="cb7-15"><a href="#cb7-15"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">1154</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">-124</span> <span class="dv">-124</span> <span class="dv">-124</span> <span class="dv">-124</span> <span class="dv">-124</span> ...</span>
-<span id="cb7-16"><a href="#cb7-16"></a> <span class="op">$</span><span class="st"> </span>id        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;california&quot;</span></span>
-<span id="cb7-17"><a href="#cb7-17"></a> <span class="op">$</span><span class="st"> </span>properties<span class="op">:</span>List of <span class="dv">11</span></span>
-<span id="cb7-18"><a href="#cb7-18"></a>  ..<span class="op">$</span><span class="st"> </span>abbreviation<span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;CA&quot;</span></span>
-<span id="cb7-19"><a href="#cb7-19"></a>  ..<span class="op">$</span><span class="st"> </span>area        <span class="op">:</span><span class="st"> </span>num <span class="dv">423968</span></span>
-<span id="cb7-20"><a href="#cb7-20"></a>  ..<span class="op">$</span><span class="st"> </span>capital     <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Sacramento&quot;</span></span>
-<span id="cb7-21"><a href="#cb7-21"></a>  ..<span class="op">$</span><span class="st"> </span>city        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Los Angeles&quot;</span></span>
-<span id="cb7-22"><a href="#cb7-22"></a>  ..<span class="op">$</span><span class="st"> </span>group       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;US States&quot;</span></span>
-<span id="cb7-23"><a href="#cb7-23"></a>  ..<span class="op">$</span><span class="st"> </span>houseseats  <span class="op">:</span><span class="st"> </span>num <span class="dv">53</span></span>
-<span id="cb7-24"><a href="#cb7-24"></a>  ..<span class="op">$</span><span class="st"> </span>landarea    <span class="op">:</span><span class="st"> </span>num <span class="dv">403466</span></span>
-<span id="cb7-25"><a href="#cb7-25"></a>  ..<span class="op">$</span><span class="st"> </span>name        <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;California&quot;</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a>  ..<span class="op">$</span><span class="st"> </span>population  <span class="op">:</span><span class="st"> </span>num <span class="dv">38332521</span></span>
-<span id="cb7-27"><a href="#cb7-27"></a>  ..<span class="op">$</span><span class="st"> </span>statehood   <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;1850-09-09&quot;</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a>  ..<span class="op">$</span><span class="st"> </span>waterarea   <span class="op">:</span><span class="st"> </span>num <span class="dv">20502</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a> <span class="op">$</span><span class="st"> </span>type      <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Feature&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># INPUT IS A URL (beginning from http..)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>url_path <span class="ot">=</span> <span class="st">&quot;https://raw.githubusercontent.com/mlampros/DataSets/master/california.geojson&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>url_js <span class="ot">=</span> <span class="fu">FROM_GeoJson</span>(<span class="at">url_file_string =</span> url_path)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(url_js)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>Warning message<span class="sc">:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>closing unused connection <span class="dv">3</span> (https<span class="sc">:</span><span class="er">//</span>raw.githubusercontent.com<span class="sc">/</span>mlampros<span class="sc">/</span>DataSets<span class="sc">/</span>master<span class="sc">/</span>california.geojson) </span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>List of <span class="dv">4</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> geometry  <span class="sc">:</span>List of <span class="dv">2</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> type       <span class="sc">:</span> chr <span class="st">&quot;MultiPolygon&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> coordinates<span class="sc">:</span>List of <span class="dv">11</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">56</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> ...</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> ...</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">36</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> ...</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">24</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">120</span> <span class="sc">-</span><span class="dv">119</span> ...</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> ...</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">42</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">119</span> ...</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">48</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">119</span> <span class="sc">-</span><span class="dv">118</span> <span class="sc">-</span><span class="dv">118</span> <span class="sc">-</span><span class="dv">118</span> <span class="sc">-</span><span class="dv">118</span> ...</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> ...</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">123</span> <span class="sc">-</span><span class="dv">123</span> <span class="sc">-</span><span class="dv">123</span> <span class="sc">-</span><span class="dv">123</span> <span class="sc">-</span><span class="dv">123</span> ...</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> <span class="sc">-</span><span class="dv">122</span> ...</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">1154</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">-</span><span class="dv">124</span> <span class="sc">-</span><span class="dv">124</span> <span class="sc">-</span><span class="dv">124</span> <span class="sc">-</span><span class="dv">124</span> <span class="sc">-</span><span class="dv">124</span> ...</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> id        <span class="sc">:</span> chr <span class="st">&quot;california&quot;</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> properties<span class="sc">:</span>List of <span class="dv">11</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> abbreviation<span class="sc">:</span> chr <span class="st">&quot;CA&quot;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> area        <span class="sc">:</span> num <span class="dv">423968</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> capital     <span class="sc">:</span> chr <span class="st">&quot;Sacramento&quot;</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> city        <span class="sc">:</span> chr <span class="st">&quot;Los Angeles&quot;</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> group       <span class="sc">:</span> chr <span class="st">&quot;US States&quot;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> houseseats  <span class="sc">:</span> num <span class="dv">53</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> landarea    <span class="sc">:</span> num <span class="dv">403466</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> name        <span class="sc">:</span> chr <span class="st">&quot;California&quot;</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> population  <span class="sc">:</span> num <span class="dv">38332521</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> statehood   <span class="sc">:</span> chr <span class="st">&quot;1850-09-09&quot;</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> waterarea   <span class="sc">:</span> num <span class="dv">20502</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> type      <span class="sc">:</span> chr <span class="st">&quot;Feature&quot;</span></span></code></pre></div>
 <p><br><br></p>
 </div>
 <div id="to_geojson" class="section level5">
 <h5><strong>TO_GeoJson</strong></h5>
 <p><br></p>
 <p>The <strong>TO_GeoJson</strong> function is an <a href="https://cran.r-project.org/package=R6">R6 class</a>, which takes as input a <em>vector</em> (in case of a <em>Point</em>) or a <em>list</em> (in case of the rest geometry objects) and converts it to a GeoJson object (named list). The output can also include the data in form of a geojson character string if the argument <em>stringify</em> is TRUE. The following code chunk shows the output for a polygon with interior rings,</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>init =<span class="st"> </span>TO_GeoJson<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb8-2"><a href="#cb8-2"></a></span>
-<span id="cb8-3"><a href="#cb8-3"></a>polygon_WITH_dat =<span class="st"> </span><span class="kw">list</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>), <span class="kw">c</span>(<span class="dv">200</span>, <span class="fl">2.01</span>), <span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.0</span>), <span class="kw">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>)),</span>
-<span id="cb8-4"><a href="#cb8-4"></a></span>
-<span id="cb8-5"><a href="#cb8-5"></a>                        <span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.8</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.9</span>), <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>)))</span>
-<span id="cb8-6"><a href="#cb8-6"></a></span>
-<span id="cb8-7"><a href="#cb8-7"></a>polygon_with =<span class="st"> </span>init<span class="op">$</span><span class="kw">Polygon</span>(polygon_WITH_dat, <span class="dt">stringify =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb8-8"><a href="#cb8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9"></a><span class="kw">str</span>(polygon_with)</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>List of <span class="dv">3</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a> <span class="op">$</span><span class="st"> </span>json_dump  <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">coordinates</span><span class="ch">\&quot;</span><span class="st">: [[[100, 1.01], [200, 2.0099999999999998], [100, 1], [100, 1.01]], [[50, 0.5], [50, 0.80000000000000004], [50,&quot;</span><span class="op">|</span><span class="st"> </span>__truncated__</span>
-<span id="cb9-3"><a href="#cb9-3"></a> <span class="op">$</span><span class="st"> </span>type       <span class="op">:</span><span class="st"> </span>chr <span class="st">&quot;Polygon&quot;</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a> <span class="op">$</span><span class="st"> </span>coordinates<span class="op">:</span>List of <span class="dv">2</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a>  ..<span class="op">$</span><span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">200</span> <span class="fl">2.01</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="dv">1</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>  ..<span class="op">$</span><span class="st"> </span><span class="er">:</span>List of <span class="dv">4</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.8</span></span>
-<span id="cb9-13"><a href="#cb9-13"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.9</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>  .. ..<span class="op">$</span><span class="st"> </span><span class="er">:</span><span class="st"> </span>num [<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># if &quot;stringify = TRUE&quot;</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">cat</span>(polygon_with<span class="op">$</span>json_dump)</span>
-<span id="cb10-4"><a href="#cb10-4"></a></span>
-<span id="cb10-5"><a href="#cb10-5"></a>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="dv">100</span>, <span class="fl">1.01</span>], [<span class="dv">200</span>, <span class="fl">2.0099999999999998</span>], [<span class="dv">100</span>, <span class="dv">1</span>], [<span class="dv">100</span>, <span class="fl">1.01</span>]], [[<span class="dv">50</span>, <span class="fl">0.5</span>], [<span class="dv">50</span>, <span class="fl">0.80000000000000004</span>], [<span class="dv">50</span>, <span class="fl">0.90000000000000002</span>], [<span class="dv">50</span>, <span class="fl">0.5</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>init <span class="ot">=</span> TO_GeoJson<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>polygon_WITH_dat <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>), <span class="fu">c</span>(<span class="dv">200</span>, <span class="fl">2.01</span>), <span class="fu">c</span>(<span class="dv">100</span>, <span class="fl">1.0</span>), <span class="fu">c</span>(<span class="dv">100</span>, <span class="fl">1.01</span>)),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>), <span class="fu">c</span>(<span class="dv">50</span>, <span class="fl">0.8</span>), <span class="fu">c</span>(<span class="dv">50</span>, <span class="fl">0.9</span>), <span class="fu">c</span>(<span class="dv">50</span>, <span class="fl">0.5</span>)))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>polygon_with <span class="ot">=</span> init<span class="sc">$</span><span class="fu">Polygon</span>(polygon_WITH_dat, <span class="at">stringify =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(polygon_with)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>List of <span class="dv">3</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> json_dump  <span class="sc">:</span> chr <span class="st">&quot;{</span><span class="sc">\&quot;</span><span class="st">coordinates</span><span class="sc">\&quot;</span><span class="st">: [[[100, 1.01], [200, 2.0099999999999998], [100, 1], [100, 1.01]], [[50, 0.5], [50, 0.80000000000000004], [50,&quot;</span><span class="sc">|</span> __truncated__</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> type       <span class="sc">:</span> chr <span class="st">&quot;Polygon&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a> <span class="sc">$</span> coordinates<span class="sc">:</span>List of <span class="dv">2</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> <span class="er">:</span>List of <span class="dv">4</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">200</span> <span class="fl">2.01</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="dv">1</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">100</span> <span class="fl">1.01</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  ..<span class="sc">$</span> <span class="er">:</span>List of <span class="dv">4</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.8</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.9</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  .. ..<span class="sc">$</span> <span class="er">:</span> num [<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="dv">50</span> <span class="fl">0.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># if &quot;stringify = TRUE&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(polygon_with<span class="sc">$</span>json_dump)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>{<span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [[[<span class="dv">100</span>, <span class="fl">1.01</span>], [<span class="dv">200</span>, <span class="fl">2.0099999999999998</span>], [<span class="dv">100</span>, <span class="dv">1</span>], [<span class="dv">100</span>, <span class="fl">1.01</span>]], [[<span class="dv">50</span>, <span class="fl">0.5</span>], [<span class="dv">50</span>, <span class="fl">0.80000000000000004</span>], [<span class="dv">50</span>, <span class="fl">0.90000000000000002</span>], [<span class="dv">50</span>, <span class="fl">0.5</span>]]], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Polygon&quot;</span>}</span></code></pre></div>
 <p><br></p>
 <p>The package documentation includes examples on how to build geojson objects for all geometries ( Point, MultiPoint, LineString, MultiLineString, Polygon (with or without interior rings), MultiPolygon, GeometryCollection, Feature and FeatureCollection ).</p>
 <p><br><br></p>
@@ -560,10 +380,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><br></p>
 <p>The <strong>Dump_From_GeoJson</strong> function returns a GeoJson character string (GeoJson-dump) for a file or url. The following code excerpt shows the output for the previously mentioned <em>feature_collection.geojson</em> file,</p>
 <p><br></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>dump_js =<span class="st"> </span><span class="kw">Dump_From_GeoJson</span>(<span class="dt">url_file =</span> <span class="st">&quot;feature_collection.geojson&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">cat</span>(dump_js)</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>{<span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{<span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="dv">102</span>, <span class="fl">0.5</span>], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Point&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[<span class="dv">102</span>, <span class="dv">0</span>], [<span class="dv">103</span>, <span class="dv">1</span>], [<span class="dv">104</span>, <span class="dv">0</span>], [<span class="dv">105</span>, <span class="dv">1</span>]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;LineString&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop0&quot;</span><span class="op">:</span><span class="st"> &quot;value0&quot;</span>, <span class="st">&quot;prop1&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">0</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dump_js <span class="ot">=</span> <span class="fu">Dump_From_GeoJson</span>(<span class="at">url_file =</span> <span class="st">&quot;feature_collection.geojson&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(dump_js)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>{<span class="st">&quot;features&quot;</span><span class="sc">:</span> [{<span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {<span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [<span class="dv">102</span>, <span class="fl">0.5</span>], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Point&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {<span class="st">&quot;prop0&quot;</span><span class="sc">:</span> <span class="st">&quot;value0&quot;</span>}, <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>}, {<span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {<span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [[<span class="dv">102</span>, <span class="dv">0</span>], [<span class="dv">103</span>, <span class="dv">1</span>], [<span class="dv">104</span>, <span class="dv">0</span>], [<span class="dv">105</span>, <span class="dv">1</span>]], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;LineString&quot;</span>}, <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {<span class="st">&quot;prop0&quot;</span><span class="sc">:</span> <span class="st">&quot;value0&quot;</span>, <span class="st">&quot;prop1&quot;</span><span class="sc">:</span> <span class="dv">0</span>}, <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;FeatureCollection&quot;</span>}</span></code></pre></div>
 <p><br></p>
 <p>The same applies to url files beginning from <em>http..</em>.</p>
 <p><br><br></p>
@@ -573,72 +393,72 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><br></p>
 <p>The aim of the <strong>Features_2Collection</strong> function is to take a vector of valid path’s / url’s of <em>Feature object</em> files as input and to return a <em>Feature Collection</em>. For instance, if I have the following two files (“Feature1.geojson”, “Feature2.geojson”),</p>
 <p><br></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># &quot;Feature1.geojson&quot;</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a></span>
-<span id="cb13-3"><a href="#cb13-3"></a>{</span>
-<span id="cb13-4"><a href="#cb13-4"></a> <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,</span>
-<span id="cb13-5"><a href="#cb13-5"></a> </span>
-<span id="cb13-6"><a href="#cb13-6"></a> <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>,</span>
-<span id="cb13-7"><a href="#cb13-7"></a> </span>
-<span id="cb13-8"><a href="#cb13-8"></a> <span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],</span>
-<span id="cb13-9"><a href="#cb13-9"></a> </span>
-<span id="cb13-10"><a href="#cb13-10"></a> <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb13-11"><a href="#cb13-11"></a> </span>
-<span id="cb13-12"><a href="#cb13-12"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>,</span>
-<span id="cb13-13"><a href="#cb13-13"></a>    </span>
-<span id="cb13-14"><a href="#cb13-14"></a>    <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[</span>
-<span id="cb13-15"><a href="#cb13-15"></a>    </span>
-<span id="cb13-16"><a href="#cb13-16"></a>         [</span>
-<span id="cb13-17"><a href="#cb13-17"></a>            [<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>], [<span class="fl">10.0</span>, <span class="fl">-10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>]</span>
-<span id="cb13-18"><a href="#cb13-18"></a>         ]</span>
-<span id="cb13-19"><a href="#cb13-19"></a>      ]</span>
-<span id="cb13-20"><a href="#cb13-20"></a>    },</span>
-<span id="cb13-21"><a href="#cb13-21"></a></span>
-<span id="cb13-22"><a href="#cb13-22"></a>    <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb13-23"><a href="#cb13-23"></a>  </span>
-<span id="cb13-24"><a href="#cb13-24"></a>      <span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr1&quot;</span>,</span>
-<span id="cb13-25"><a href="#cb13-25"></a>  </span>
-<span id="cb13-26"><a href="#cb13-26"></a>      <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb13-27"><a href="#cb13-27"></a>    }</span>
-<span id="cb13-28"><a href="#cb13-28"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;Feature1.geojson&quot;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;id&quot;</span><span class="sc">:</span> <span class="dv">1</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;bbox&quot;</span><span class="sc">:</span> [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Polygon&quot;</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>         [</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>]</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>         ]</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>      ]</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;prop_1&quot;</span><span class="sc">:</span> <span class="st">&quot;addr1&quot;</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;prop_2&quot;</span><span class="sc">:</span> <span class="dv">1</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><br></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># &quot;Feature2.geojson&quot;</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3"></a>{</span>
-<span id="cb14-4"><a href="#cb14-4"></a> <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>,</span>
-<span id="cb14-5"><a href="#cb14-5"></a> </span>
-<span id="cb14-6"><a href="#cb14-6"></a> <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>,</span>
-<span id="cb14-7"><a href="#cb14-7"></a> </span>
-<span id="cb14-8"><a href="#cb14-8"></a> <span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],</span>
-<span id="cb14-9"><a href="#cb14-9"></a> </span>
-<span id="cb14-10"><a href="#cb14-10"></a> <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb14-11"><a href="#cb14-11"></a> </span>
-<span id="cb14-12"><a href="#cb14-12"></a>    <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>,</span>
-<span id="cb14-13"><a href="#cb14-13"></a>    </span>
-<span id="cb14-14"><a href="#cb14-14"></a>    <span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[</span>
-<span id="cb14-15"><a href="#cb14-15"></a>    </span>
-<span id="cb14-16"><a href="#cb14-16"></a>         [</span>
-<span id="cb14-17"><a href="#cb14-17"></a>            [<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>], [<span class="fl">10.0</span>, <span class="fl">-10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">-10.0</span>]</span>
-<span id="cb14-18"><a href="#cb14-18"></a>         ]</span>
-<span id="cb14-19"><a href="#cb14-19"></a>      ]</span>
-<span id="cb14-20"><a href="#cb14-20"></a>    },</span>
-<span id="cb14-21"><a href="#cb14-21"></a></span>
-<span id="cb14-22"><a href="#cb14-22"></a>    <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{</span>
-<span id="cb14-23"><a href="#cb14-23"></a>  </span>
-<span id="cb14-24"><a href="#cb14-24"></a>      <span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr2&quot;</span>,</span>
-<span id="cb14-25"><a href="#cb14-25"></a>  </span>
-<span id="cb14-26"><a href="#cb14-26"></a>      <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span></span>
-<span id="cb14-27"><a href="#cb14-27"></a>    }</span>
-<span id="cb14-28"><a href="#cb14-28"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;Feature2.geojson&quot;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;id&quot;</span><span class="sc">:</span> <span class="dv">2</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;bbox&quot;</span><span class="sc">:</span> [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">10.0</span>],</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a> <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Polygon&quot;</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>         [</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>            [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>], [<span class="fl">10.0</span>, <span class="fl">10.0</span>], [<span class="sc">-</span><span class="fl">10.0</span>, <span class="sc">-</span><span class="fl">10.0</span>]</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>         ]</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>      ]</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;prop_1&quot;</span><span class="sc">:</span> <span class="st">&quot;addr2&quot;</span>,</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;prop_2&quot;</span><span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p><br></p>
 <p>then the output of the function will be a Feature Collection dump,</p>
 <p><br></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>vec_in =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Feature1.geojson&quot;</span>, <span class="st">&quot;Feature2.geojson&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2"></a></span>
-<span id="cb15-3"><a href="#cb15-3"></a>res_fcol =<span class="st"> </span><span class="kw">Features_2Collection</span>(vec_in, <span class="dt">bbox_vec =</span> <span class="ot">NULL</span>)</span>
-<span id="cb15-4"><a href="#cb15-4"></a></span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="kw">cat</span>(res_fcol)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>{<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[], <span class="st">&quot;features&quot;</span><span class="op">:</span><span class="st"> </span>[{<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>], [<span class="dv">10</span>, <span class="dv">-10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr1&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">1</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}, {<span class="st">&quot;bbox&quot;</span><span class="op">:</span><span class="st"> </span>[<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;coordinates&quot;</span><span class="op">:</span><span class="st"> </span>[[[<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>], [<span class="dv">10</span>, <span class="dv">-10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="op">-</span><span class="dv">10</span>, <span class="dv">-10</span>]]], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;properties&quot;</span><span class="op">:</span><span class="st"> </span>{<span class="st">&quot;prop_1&quot;</span><span class="op">:</span><span class="st"> &quot;addr2&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="op">:</span><span class="st"> </span><span class="dv">2</span>}, <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="op">:</span><span class="st"> &quot;FeatureCollection&quot;</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>vec_in <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Feature1.geojson&quot;</span>, <span class="st">&quot;Feature2.geojson&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>res_fcol <span class="ot">=</span> <span class="fu">Features_2Collection</span>(vec_in, <span class="at">bbox_vec =</span> <span class="cn">NULL</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(res_fcol)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>{<span class="st">&quot;bbox&quot;</span><span class="sc">:</span> [], <span class="st">&quot;features&quot;</span><span class="sc">:</span> [{<span class="st">&quot;bbox&quot;</span><span class="sc">:</span> [<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {<span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [[[<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="sc">:</span> <span class="dv">1</span>, <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {<span class="st">&quot;prop_1&quot;</span><span class="sc">:</span> <span class="st">&quot;addr1&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="sc">:</span> <span class="dv">1</span>}, <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>}, {<span class="st">&quot;bbox&quot;</span><span class="sc">:</span> [<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>], <span class="st">&quot;geometry&quot;</span><span class="sc">:</span> {<span class="st">&quot;coordinates&quot;</span><span class="sc">:</span> [[[<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>], [<span class="dv">10</span>, <span class="dv">10</span>], [<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">10</span>]]], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Polygon&quot;</span>}, <span class="st">&quot;id&quot;</span><span class="sc">:</span> <span class="dv">2</span>, <span class="st">&quot;properties&quot;</span><span class="sc">:</span> {<span class="st">&quot;prop_1&quot;</span><span class="sc">:</span> <span class="st">&quot;addr2&quot;</span>, <span class="st">&quot;prop_2&quot;</span><span class="sc">:</span> <span class="dv">2</span>}, <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;Feature&quot;</span>}], <span class="st">&quot;type&quot;</span><span class="sc">:</span> <span class="st">&quot;FeatureCollection&quot;</span>}</span></code></pre></div>
 <p><br><br></p>
 </div>
 <div id="web-applications-using-shiny-leaflet-geojsonr-and-nominatim" class="section level5">
